@@ -1,7 +1,7 @@
 ---
 name: 환경 설정
 about: 개발 환경 세팅
-title: "[chore]"
+title: "[setting]"
 labels: "환경설정"
 assignees: 'username'
 
