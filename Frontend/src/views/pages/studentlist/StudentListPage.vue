@@ -1,6 +1,7 @@
 <script setup>
 import { CustomerService } from '@/service/CustomerService';
 import { ProductService } from '@/service/ProductService';
+import StudentDetailModal from '@/views/pages/studentDetail/StudentDetailModal.vue';
 import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
 import { onBeforeMount, reactive, ref } from 'vue';
 
@@ -8,7 +9,7 @@ const customers1 = ref(null);
 const customers2 = ref(null);
 const customers3 = ref(null);
 const filters1 = ref(null);
-const loading1 = ref(null);
+const loading1 = ref(true);
 const balanceFrozen = ref(false);
 const products = ref(null);
 const expandedRows = ref([]);
@@ -25,6 +26,9 @@ const representatives = reactive([
     { name: 'Stephen Shaw', image: 'stephenshaw.png' },
     { name: 'XuXue Feng', image: 'xuxuefeng.png' }
 ]);
+
+const selectedCustomer = ref(null);
+const displayDialog = ref(false);
 
 function getOrderSeverity(order) {
     switch (order.status) {
@@ -139,6 +143,13 @@ function calculateCustomerTotal(name) {
 
     return total;
 }
+
+function showStudentDetails(event) {
+    console.log('해당 학생 정보 : ', event.data);
+    selectedCustomer.value = event.data;
+    displayDialog.value = true;
+}
+
 </script>
 
 <template>
@@ -156,6 +167,7 @@ function calculateCustomerTotal(name) {
             :filters="filters1"
             :globalFilterFields="['name', 'country.name', 'balance', 'status']"
             showGridlines
+            @row-click="showStudentDetails"
         >
             <template #header>
                 <div class="flex justify-between items-center">
@@ -222,6 +234,8 @@ function calculateCustomerTotal(name) {
                 </template>
             </Column>
         </DataTable>
+        
+        <StudentDetailModal :student="selectedCustomer" :visible="displayDialog" @update:visible="displayDialog = $event" />
     </div>
 </template>
 
