@@ -29,9 +29,9 @@ const router = createRouter({
                     component: () => import('@/views/uikit/ButtonDoc.vue')
                 },
                 {
-                    path: '/uikit/table',
-                    name: 'table',
-                    component: () => import('@/views/uikit/TableDoc.vue')
+                    path: '/studentlist',
+                    name: 'studentlist',
+                    component: () => import('@/views/pages/studentlist/StudentListPage.vue')
                 },
                 {
                     path: '/uikit/list',
