@@ -1,6 +1,7 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
 import AppConfigurator from './AppConfigurator.vue';
+import 'primeicons/primeicons.css';
 
 const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
 </script>
@@ -30,7 +31,7 @@ const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
                     </g>
                 </svg>
 
-                <span>혜쪽이</span>
+                <span>1조</span>
             </router-link>
         </div>
 
@@ -60,17 +61,60 @@ const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
+                    <button
+                        type="button"
+                        class="layout-topbar-action"
+                        v-tooltip.bottom="{
+                            value: '로그인',
+                            pt: {
+                                arrow: {
+                                    style: {
+                                        borderBottomColor: 'var(--p-noir)'
+                                    }
+                                },
+                                text: '!bg-noir !text-primary-contrast !font-medium'
+                            }
+                        }"
+                    >
+                        <i class="pi pi-sign-in"></i>
+                        <span>로그인</span>
                     </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox"></i>
-                        <span>Messages</span>
+
+                    <button
+                        type="button"
+                        class="layout-topbar-action"
+                        v-tooltip.bottom="{
+                            value: '로그아웃',
+                            pt: {
+                                arrow: {
+                                    style: {
+                                        borderBottomColor: 'var(--p-noir)'
+                                    }
+                                },
+                                text: '!bg-noir !text-primary-contrast !font-medium'
+                            }
+                        }"
+                    >
+                        <i class="pi pi-sign-out"></i>
+                        <span>로그아웃</span>
                     </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-user"></i>
-                        <span>Profile</span>
+                    <button
+                        type="button"
+                        class="layout-topbar-action"
+                        v-tooltip.bottom="{
+                            value: '회원가입',
+                            pt: {
+                                arrow: {
+                                    style: {
+                                        borderBottomColor: 'var(--p-noir)'
+                                    }
+                                },
+                                text: '!bg-noir !text-primary-contrast !font-medium'
+                            }
+                        }"
+                    >
+                        <i class="pi pi-user-plus"></i>
+                        <span>회원가입</span>
                     </button>
                 </div>
             </div>
