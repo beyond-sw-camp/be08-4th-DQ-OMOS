@@ -1,9 +1,17 @@
 <template>
-    <Dialog :visible.sync="localVisible" header="학생 상세 정보" :modal="true" :closable="true" @update:visible="handleVisibilityUpdate">
-        <div v-if="student">
+    <Dialog 
+        :visible.sync="localVisible" 
+        header="학생 상세 정보" 
+        :modal="true" 
+        :closable="true" 
+        @update:visible="handleVisibilityUpdate"
+        :style="{ width: '500px', maxWidth: '90vw' }"
+    >
+        <div v-if="student" class="student-details">
             <p><strong>이름:</strong> {{ student.name }}</p>
             <p><strong>개강일:</strong> {{ formatDate(student.date) }}</p>
             <p><strong>상태:</strong> {{ student.status }}</p>
+            <p><strong>출석률:</strong> {{ student.activity }}%</p>
         </div>
     </Dialog>
 </template>
@@ -42,3 +50,23 @@ function formatDate(value) {
     });
 }
 </script>
+
+<style scoped>
+.student-details {
+    padding: 1rem;
+}
+
+.student-details p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.student-details p:not(:last-child) {
+    margin-bottom: 1rem;
+}
+
+.student-details strong {
+    font-weight: 600;
+}
+</style>
