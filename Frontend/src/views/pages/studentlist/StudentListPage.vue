@@ -149,7 +149,6 @@ function showStudentDetails(event) {
     selectedCustomer.value = event.data;
     displayDialog.value = true;
 }
-
 </script>
 
 <template>
@@ -234,7 +233,7 @@ function showStudentDetails(event) {
                 </template>
             </Column>
         </DataTable>
-        
+
         <StudentDetailModal :student="selectedCustomer" :visible="displayDialog" @update:visible="displayDialog = $event" />
     </div>
 </template>
