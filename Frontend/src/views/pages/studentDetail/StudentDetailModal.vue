@@ -1,5 +1,5 @@
 <template>
-    <Dialog :visible="visible" header="학생 상세 정보" :modal="true" :closable="true" @hide="onHide">
+    <Dialog :visible.sync="localVisible" header="학생 상세 정보" :modal="true" :closable="true" @update:visible="handleVisibilityUpdate">
         <div v-if="student">
             <p><strong>이름:</strong> {{ student.name }}</p>
             <p><strong>개강일:</strong> {{ formatDate(student.date) }}</p>
@@ -9,6 +9,7 @@
 </template>
 
 <script setup>
+import { ref, watch } from 'vue';
 
 const props = defineProps({
     student: Object,
@@ -17,8 +18,20 @@ const props = defineProps({
 
 const emit = defineEmits(['update:visible']);
 
-function onHide() {
-    emit('update:visible', false);
+const localVisible = ref(props.visible);
+
+// 부모에서 받은 visible 상태를 로컬 상태로 반영
+watch(
+    () => props.visible,
+    (newVal) => {
+        localVisible.value = newVal;
+    }
+);
+
+// 로컬 visible 상태가 변경되면 부모 컴포넌트에 반영
+function handleVisibilityUpdate(newVal) {
+    localVisible.value = newVal;
+    emit('update:visible', newVal);
 }
 
 function formatDate(value) {
