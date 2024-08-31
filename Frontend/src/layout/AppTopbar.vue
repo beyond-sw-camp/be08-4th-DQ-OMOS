@@ -5,14 +5,25 @@ import 'primeicons/primeicons.css';
 import { ref } from 'vue';
 import SignInDialog from '@/views/pages/auth/SignInDialog.vue';
 import SignUpDialog from '@/views/pages/auth/SignUpDialog.vue';
+import authService from '@/service/authService';
 
 const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
+
+const email = ref('');
+const name = ref('');
+const password = ref('');
+const confirmPassword = ref('');
+const error = ref('');
 
 const displaySignInDialog = ref(false);
 const displaySignUpDialog = ref(false);
 
 const toggleSingInDialog = () => displaySignInDialog.value = !displaySignInDialog.value;
 const toggleSingUpDialog = () => displaySignUpDialog.value = !displaySignUpDialog.value;
+
+const logout = async () => {
+  await authService.logout();
+}
 
 </script>
 
@@ -89,7 +100,7 @@ const toggleSingUpDialog = () => displaySignUpDialog.value = !displaySignUpDialo
               },
               text: '!bg-primary !text-primary-contrast !font-medium'
             }
-          }">
+          }" @click="logout">
             <i class="pi pi-sign-out"></i>
             <span>로그아웃</span>
           </button>
