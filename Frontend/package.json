@@ -8,6 +8,9 @@
         "lint": "eslint --fix . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
     },
     "dependencies": {
+        "@fullcalendar/core": "^6.1.15",
+        "@fullcalendar/daygrid": "^6.1.15",
+        "@fullcalendar/vue3": "^6.1.15",
         "@primevue/themes": "^4.0.5",
         "axios": "^1.7.6",
         "chart.js": "3.3.2",
