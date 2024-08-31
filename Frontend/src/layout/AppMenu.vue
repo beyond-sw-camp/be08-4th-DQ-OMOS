@@ -15,6 +15,7 @@ const model = ref([
             { label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
             { label: 'Button', icon: 'pi pi-fw pi-mobile', to: '/uikit/button', class: 'rotated-icon' },
             { label: '학생목록', icon: 'pi pi-fw pi-list', to: '/studentlist' },
+            { label: '캘린더', icon: 'pi pi-fw pi-calendar', to: '/calendar' },
             { label: 'List', icon: 'pi pi-fw pi-list', to: '/uikit/list' },
             { label: 'Tree', icon: 'pi pi-fw pi-share-alt', to: '/uikit/tree' },
             { label: 'Panel', icon: 'pi pi-fw pi-tablet', to: '/uikit/panel' },
