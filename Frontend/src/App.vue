@@ -1,7 +1,16 @@
-<script setup></script>
-<!-- 풀리 테스트 -->
+<script setup>
+import { onMounted } from 'vue';
+import { useAuthStore } from '@/stores/authStore';
+
+const authStore = useAuthStore();
+
+onMounted(() => {
+  authStore.initializeAuth();
+});
+</script>
+
 <template>
-    <router-view />
+  <router-view />
 </template>
 
 <style scoped></style>

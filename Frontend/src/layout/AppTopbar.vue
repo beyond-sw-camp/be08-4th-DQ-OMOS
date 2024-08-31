@@ -5,15 +5,11 @@ import 'primeicons/primeicons.css';
 import { ref } from 'vue';
 import SignInDialog from '@/views/pages/auth/SignInDialog.vue';
 import SignUpDialog from '@/views/pages/auth/SignUpDialog.vue';
+import { useAuthStore } from '@/stores/authStore';
 import authService from '@/service/authService';
+import router from '@/router';
 
 const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
-
-const email = ref('');
-const name = ref('');
-const password = ref('');
-const confirmPassword = ref('');
-const error = ref('');
 
 const displaySignInDialog = ref(false);
 const displaySignUpDialog = ref(false);
@@ -21,10 +17,17 @@ const displaySignUpDialog = ref(false);
 const toggleSingInDialog = () => displaySignInDialog.value = !displaySignInDialog.value;
 const toggleSingUpDialog = () => displaySignUpDialog.value = !displaySignUpDialog.value;
 
-const logout = async () => {
-  await authService.logout();
-}
+const authStore = useAuthStore();
 
+const handleLogout = async () => {
+  try {
+    await authService.logout();
+    authStore.logout();
+    router.push('/');
+  } catch (err) {
+    alert(err.message);
+  }
+};
 </script>
 
 <template>
@@ -77,7 +80,7 @@ const logout = async () => {
 
       <div class="layout-topbar-menu hidden lg:block">
         <div class="layout-topbar-menu-content">
-          <button type="button" class="layout-topbar-action" v-tooltip.bottom="{
+          <button v-if="!authStore.isLoggedIn" type="button" class="layout-topbar-action" v-tooltip.bottom="{
             value: '로그인',
             pt: {
               arrow: {
@@ -90,7 +93,7 @@ const logout = async () => {
             <span>로그인</span>
           </button>
 
-          <button type="button" class="layout-topbar-action" v-tooltip.bottom="{
+          <button v-if="authStore.isLoggedIn" type="button" class="layout-topbar-action" v-tooltip.bottom="{
             value: '로그아웃',
             pt: {
               arrow: {
@@ -100,12 +103,12 @@ const logout = async () => {
               },
               text: '!bg-primary !text-primary-contrast !font-medium'
             }
-          }" @click="logout">
+          }" @click="handleLogout">
             <i class="pi pi-sign-out"></i>
             <span>로그아웃</span>
           </button>
 
-          <button type="button" class="layout-topbar-action" v-tooltip.bottom="{
+          <button v-if="!authStore.isLoggedIn" type="button" class="layout-topbar-action" v-tooltip.bottom="{
             value: '회원가입',
             pt: {
               arrow: {

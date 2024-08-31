@@ -1,6 +1,6 @@
 <template>
   <Dialog :visible="visible" pt:root:class="!border-0 !bg-transparent" pt:mask:class="backdrop-blur-md"
-    :style="{ width: '20vw' }">
+    :style="{ width: '25vw' }">
     <template #container="{ closeCallback }">
       <div class="flex flex-col px-8 py-6 gap-4 rounded-xl shadow-lg bg-white">
         <h1 class="text-gray-800 text-2xl font-semibold">회원가입</h1>
@@ -76,7 +76,6 @@ const confirmPassword = ref('');
 const error = ref('');
 
 const handleRegister = async () => {
-  console.log('회원가입');
   if (password.value !== confirmPassword.value) {
     error.value = '비밀번호가 일치하지 않습니다.';
     return;

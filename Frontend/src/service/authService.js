@@ -20,26 +20,61 @@ const register = async (email, name, password) => {
   }
 };
 
+const login = async (username, password) => {
+  const credentials = new URLSearchParams();
+  credentials.append('username', username);
+  credentials.append('password', password);
 
-const login = async (email, password) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, { email, password });
-    return response.data;
+    const response = await axios.post(`${API_URL}/login`, credentials, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      withCredentials: true, // This will send cookies along with the request
+    });
+
+    if (response.status === 200) {
+      const { email } = response.data;
+
+      return { success: true, email };
+    } else {
+      throw new Error('로그인 실패');
+    }
   } catch (error) {
+    console.error('Login error:', error);
     throw new Error('로그인 실패. 다시 시도해주세요.');
   }
 };
 
 const logout = async () => {
   try {
-    await axios.post(`${API_URL}/logout`);
+    const response = await fetch(`${API_URL}/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+    if (response.ok) {
+      alert("로그아웃 성공");
+      window.localStorage.removeItem("access");
+    } else {
+      alert("로그아웃 실패");
+    }
   } catch (error) {
-    throw new Error('로그아웃 실패. 다시 시도해주세요.');
+    console.error("로그아웃 중 오류 발생: ", error);
   }
+};
+
+const onNaverLogin = () => {
+  window.location.href = `${API_URL}/oauth2/authorization/naver`;
+};
+
+const onGoogleLogin = () => {
+  window.location.href = `${API_URL}/oauth2/authorization/google`;
 };
 
 export default {
   register,
   login,
   logout,
+  onNaverLogin,
+  onGoogleLogin,
 };
