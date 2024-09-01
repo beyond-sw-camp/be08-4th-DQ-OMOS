@@ -1,14 +1,53 @@
+<template>
+    <div class="demo-app">
+        <div class="demo-app-sidebar">
+            <div class="demo-app-sidebar-section">
+                <h2>사용법</h2>
+                <ul>
+                    <li>날짜를 클릭해서 이벤트를 추가할 수 있습니다.</li>
+                    <li>생성된 이벤트를 다른 날짜로 옮기거나, 당겨서 날짜를 늘릴 수 있습니다.</li>
+                    <li>클릭해서 이벤트를 삭제할 수 있습니다.</li>
+                </ul>
+            </div>
+            <div class="demo-app-sidebar-section">
+                <h2>All Events ({{ currentEvents.length }})</h2>
+                <ul>
+                    <li v-for="event in currentEvents" :key="event.id">
+                        <b>{{ event.startStr }}</b>
+                        <i>{{ event.title }}</i> - <span>{{ event.extendedProps.category }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="demo-app-main">
+            <FullCalendar class="demo-app-calendar" :options="calendarOptions">
+                <template v-slot:eventContent="arg">
+                    <b>{{ arg.timeText }}</b>
+                    <i>{{ arg.event.title }}</i>
+                </template>
+            </FullCalendar>
+        </div>
+        <EventModal :isOpen="isModalOpen" :initialData="selectedInfo ? { start: selectedInfo.startStr, end: selectedInfo.endStr } : {}" @save="saveEvent" @close="closeModal" />
+        <EventDetailModal :isOpen="isDetailModalOpen" :event="selectedEvent" @delete="deleteEvent" @close="closeDetailModal" />
+    </div>
+</template>
+
 <script>
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import FullCalendar from '@fullcalendar/vue3';
 import { defineComponent } from 'vue';
-import { INITIAL_EVENTS, createEventId } from '/src/views/pages/calendar/utils/event-utils.js';
+import EventDetailModal from './EventDetailModal.vue';
+import EventModal from './EventModal.vue';
+import { INITIAL_EVENTS } from '/src/views/pages/calendar/utils/data.js';
+import { createEventId } from '/src/views/pages/calendar/utils/event-utils.js';
 
 export default defineComponent({
     components: {
-        FullCalendar
+        FullCalendar,
+        EventModal,
+        EventDetailModal
     },
     data() {
         return {
@@ -30,78 +69,66 @@ export default defineComponent({
                 eventClick: this.handleEventClick,
                 eventsSet: this.handleEvents
             },
-            currentEvents: []
+            currentEvents: [],
+            isModalOpen: false,
+            isDetailModalOpen: false,
+            selectedInfo: null,
+            selectedEvent: null
         };
     },
     methods: {
-        handleWeekendsToggle() {
-            this.calendarOptions.weekends = !this.calendarOptions.weekends;
-        },
         handleDateSelect(selectInfo) {
-            let title = prompt('Please enter a new title for your event');
-            let calendarApi = selectInfo.view.calendar;
-
-            calendarApi.unselect();
-
-            if (title) {
-                calendarApi.addEvent({
-                    id: createEventId(),
-                    title,
-                    start: selectInfo.startStr,
-                    end: selectInfo.endStr,
-                    allDay: selectInfo.allDay
-                });
-            }
+            this.selectedInfo = selectInfo;
+            this.isModalOpen = true;
         },
         handleEventClick(clickInfo) {
-            if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-                clickInfo.event.remove();
-            }
+            this.selectedEvent = clickInfo.event;
+            this.isDetailModalOpen = true;
         },
         handleEvents(events) {
             this.currentEvents = events;
+        },
+        saveEvent(eventData) {
+            let calendarApi = this.selectedInfo.view.calendar;
+            calendarApi.unselect();
+
+            const categoryColors = {
+                휴가: '#ffcccc',
+                출근: '#ccffcc',
+                병가: '#ffe6cc',
+                조퇴: '#cce6ff',
+                회의: '#cce6ff',
+                마감: '#ffe6cc',
+                리뷰: '#ffe6cc'
+            };
+
+            if (eventData.title) {
+                calendarApi.addEvent({
+                    id: createEventId(),
+                    title: eventData.title,
+                    start: eventData.start,
+                    end: eventData.end,
+                    backgroundColor: categoryColors[eventData.category],
+                    extendedProps: {
+                        category: eventData.category
+                    },
+                    allDay: this.selectedInfo.allDay
+                });
+            }
+            this.closeModal();
+        },
+        deleteEvent(event) {
+            event.remove();
+        },
+        closeModal() {
+            this.isModalOpen = false;
+        },
+        closeDetailModal() {
+            this.isDetailModalOpen = false;
         }
     }
 });
 </script>
-
-<template>
-    <div class="demo-app">
-        <div class="demo-app-sidebar">
-            <div class="demo-app-sidebar-section">
-                <h2>사용법</h2>
-                <ul>
-                    <li>날짜를 클릭해서 이벤트를 추가할 수 있습니다.</li>
-                    <li>생성된 이벤트를 다른 날짜로 옮기거나, 당겨서 날짜를 늘릴 수 있습니다.</li>
-                    <li>클릭해서 이벤트를 삭제할 수 있습니다.</li>
-                </ul>
-            </div>
-            <div class="demo-app-sidebar-section">
-                <label>
-                    <input type="checkbox" :checked="calendarOptions.weekends" @change="handleWeekendsToggle" />
-                    toggle weekends
-                </label>
-            </div>
-            <div class="demo-app-sidebar-section">
-                <h2>All Events ({{ currentEvents.length }})</h2>
-                <ul>
-                    <li v-for="event in currentEvents" :key="event.id">
-                        <b>{{ event.startStr }}</b>
-                        <i>{{ event.title }}</i>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div class="demo-app-main">
-            <FullCalendar class="demo-app-calendar" :options="calendarOptions">
-                <template v-slot:eventContent="arg">
-                    <b>{{ arg.timeText }}</b>
-                    <i>{{ arg.event.title }}</i>
-                </template>
-            </FullCalendar>
-        </div>
-    </div>
-</template>
 
 <style lang="css">
 h2 {
