@@ -1,2 +1,1 @@
-# be08-4th-1team
-d
+# be08-4th-DailyQuest-OneMinOneSec
