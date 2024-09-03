@@ -2,6 +2,52 @@
 import { useLayout } from '@/layout/composables/layout';
 import { ProductService } from '@/service/ProductService';
 import { onMounted, ref, watch, onUnmounted } from 'vue';
+import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
+import OverlayBadge from 'primevue/overlaybadge';
+
+const alarmDisplayDialog = ref(false);
+const selectedNotification = ref(null);
+const showMore = ref(false);
+
+// 샘플 알림 데이터
+const notifications = [
+    { id: 1, iconClass: 'pi pi-map text-green-500', text: '휴가 신청', bgColor: 'bg-green-100 dark:bg-green-400/10' },
+    { id: 2, iconClass: 'pi pi-folder-open text-blue-500', text: '조퇴 신청', bgColor: 'bg-blue-100 dark:bg-blue-400/10' },
+    { id: 3, iconClass: 'pi pi-envelope text-cyan-500', text: '병가 신청', bgColor: 'bg-cyan-100 dark:bg-cyan-400/10' },
+    { id: 4, iconClass: 'pi pi-check-square text-purple-500', text: '지각 신청', bgColor: 'bg-purple-100 dark:bg-purple-400/10' },
+    { id: 5, iconClass: 'pi pi-file-edit text-orange-500', text: '출결 신청', bgColor: 'bg-orange-100 dark:bg-orange-400/10' },
+  // 추가 알림 항목들...
+];
+
+// 모달 열기
+function openModal(notification) {
+    selectedNotification.value = notification;
+    alarmDisplayDialog.value = true;
+}
+
+// 모달 닫기
+function closeModal() {
+    alarmDisplayDialog.value = false;
+    selectedNotification.value = null;
+}
+
+// 승인 버튼 클릭 처리
+function approve() {
+    console.log(`승인: ${selectedNotification.value?.text}`);
+    closeModal();
+}
+
+// 거부 버튼 클릭 처리
+function reject() {
+    console.log(`거부: ${selectedNotification.value?.text}`);
+    closeModal();
+}
+
+// 더보기 버튼 클릭 처리
+function toggleShowMore() {
+    showMore.value = !showMore.value;
+}
 
 const { getPrimary, getSurface, isDarkTheme } = useLayout();
 
@@ -25,39 +71,52 @@ const updateDate = () => {
     currentDate.value = new Date().toLocaleString();
 };
 
+
+// 공지사항 데이터 정의
+const announcements = ref([
+    {
+        id: 1,
+        type: '일반',
+        title: '새로운 강의 안내',
+        content: '새로운 Vue.js 강의가 다음 주부터 시작됩니다. 많은 참여 부탁드립니다.',
+        date: '2023-09-01'
+    },
+    {
+        id: 2,
+        type: '긴급',
+        title: '서버 점검 안내',
+        content: '내일 오전 2시부터 4시까지 서버 점검이 있을 예정입니다. 서비스 이용에 참고 바랍니다.',
+        date: '2023-09-02'
+    },
+    // 추가 공지사항 항목들...
+]);
+
+// Dialog와 선택된 공지사항을 위한 상태 관리
+const displayDialog = ref(false);
+const selectedAnnouncement = ref(null);
+
+// Dialog 열기 함수
+function openDialog(announcement) {
+    selectedAnnouncement.value = announcement;
+    displayDialog.value = true;
+}
+
+// Dialog 닫기 함수
+function closeDialog() {
+    displayDialog.value = false;
+    selectedAnnouncement.value = null;
+}
+
 const items = ref([
     { label: 'Add New', icon: 'pi pi-fw pi-plus' },
     { label: 'Remove', icon: 'pi pi-fw pi-trash' }
 ]);
 
-
 onMounted(() => {
-    ProductService.getProductsSmall().then((data) => {        
-        products.value = data;
-        // 특정 Title 값을 변경
-        const titles = [
-            '특강 일정 안내', 
-            '출결 공지', 
-            '휴가 신청 안내', 
-            '조퇴 처리 기준', 
-            '병결 증명서 제출'
-        ];
-
-        // 최대 5개의 Title을 설정
-        for (let i = 0; i < products.value.length && i < titles.length; i++) {
-            products.value[i].Title = titles[i];
-        }
-
-    });
+    ProductService.getProductsSmall().then((data) => (products.value = data));
     chartData.value = setChartData();
     chartOptions.value = setChartOptions();
 });
-
-// onMounted(() => {
-//     ProductService.getProductsSmall().then((data) => (products.value = data));
-//     chartData.value = setChartData();
-//     chartOptions.value = setChartOptions();
-// });
 
 function setChartData() {
     const documentStyle = getComputedStyle(document.documentElement);
@@ -129,12 +188,6 @@ function setChartOptions() {
     };
 }
 
-function openNew() {
-    product.value = {};
-    submitted.value = false;
-    productDialog.value = true;
-}
-
 // const formatCurrency = (value) => {
 //     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 // };
@@ -161,7 +214,7 @@ watch([getPrimary, getSurface, isDarkTheme], () => {
                         <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">30명</div>
                     </div>
                     <div class="flex items-center justify-center bg-blue-100 dark:bg-blue-400/10 rounded-border" style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-file-check text-blue-500 !text-xl"></i>
+                        <i class="pi pi-check-circle text-blue-500 !text-xl"></i>
                     </div>
                 </div>
                 <span class="text-muted-color">{{ currentDate }}</span>
@@ -175,7 +228,7 @@ watch([getPrimary, getSurface, isDarkTheme], () => {
                         <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">1명</div>
                     </div>
                     <div class="flex items-center justify-center bg-orange-100 dark:bg-orange-400/10 rounded-border" style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-dollar text-orange-500 !text-xl"></i>
+                        <i class="pi pi-map text-orange-500 !text-xl"></i>
                     </div>
                 </div>
                 <span class="text-muted-color">{{ currentDate }}</span>
@@ -189,7 +242,7 @@ watch([getPrimary, getSurface, isDarkTheme], () => {
                         <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">0명</div>
                     </div>
                     <div class="flex items-center justify-center bg-cyan-100 dark:bg-cyan-400/10 rounded-border" style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-users text-cyan-500 !text-xl"></i>
+                        <i class="pi pi-folder-open text-cyan-500 !text-xl"></i>
                     </div>
                 </div>
                 <span class="text-muted-color">{{ currentDate }}</span>
@@ -203,7 +256,7 @@ watch([getPrimary, getSurface, isDarkTheme], () => {
                         <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">0명</div>
                     </div>
                     <div class="flex items-center justify-center bg-purple-100 dark:bg-purple-400/10 rounded-border" style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-comment text-purple-500 !text-xl"></i>
+                        <i class="pi pi-envelope text-purple-500 !text-xl"></i>
                     </div>
                 </div>
                 <span class="text-muted-color">{{ currentDate }}</span>
@@ -213,120 +266,46 @@ watch([getPrimary, getSurface, isDarkTheme], () => {
         <div class="col-span-12 xl:col-span-6">
             <div class="card">
                 <div class="font-semibold text-xl mb-4">공지사항</div>
-                <DataTable :value="products" :rows="5" :paginator="true" responsiveLayout="scroll">
-                    <Column class="Type" field="Type" header="Type" :sortable="true" style="width: 35%">
+                <DataTable :value="announcements" :rows="5" :paginator="true" responsiveLayout="scroll">
+                    <!-- Type 컬럼 -->
+                    <Column field="type" header="Type" style="width: 20%">
                         <template #body="slotProps">
-                            <!-- <span>{{ formatTitle(slotProps.data.price) }}</span> -->
-                            <!-- <span>{{ ProductService.titles }}</span> -->
-                            <span>{{ slotProps.data.Title }}</span>
-                        </template>
-                    </Column>
-                    <Column field="Title" header="Title" style="width: 35%">
-                        <template #body="slotProps">
-                            <!-- <span>{{ formatTitle(slotProps.data.price) }}</span> -->
-                            <!-- <span>{{ ProductService.titles }}</span> -->
-                            <span>{{ slotProps.data.Title }}</span>
+                            <span>{{ slotProps.data.type }}</span>
                         </template>
                     </Column>
 
+                    <!-- Title 컬럼 -->
+                    <Column field="title" header="Title" style="width: 50%">
+                        <template #body="slotProps">
+                            <span>{{ slotProps.data.title }}</span>
+                        </template>
+                    </Column>
+
+                    <!-- View 버튼 컬럼 -->
                     <Column style="width: 15%" header="View">
-                        <template #body>
-                            <Dialog header="공지사항" v-model:visible="display" :breakpoints="{ '960px': '75vw' }" :style="{ width: '30vw' }" :modal="true">
-                                <p class="leading-normal m-0">
-                                    공지사항1
-                                </p>
-                                <template #footer>
-                                    <Button label="Save" @click="close" />
-                                </template>
-                            </Dialog>
-                            <Button icon="pi pi-search" type="button" class="p-button-text" @click="open"></Button>
+                        <template #body="slotProps">
+                            <Button 
+                                icon="pi pi-search" 
+                                type="button" 
+                                class="p-button-text" 
+                                @click="openDialog(slotProps.data)" 
+                            />
                         </template>
                     </Column>
                 </DataTable>
+
+                <!-- Dialog -->
+                <Dialog header="공지사항 상세" v-model:visible="displayDialog" pt:mask:class="backdrop-blur-md" :breakpoints="{ '960px': '75vw' }" :style="{ width: '30vw' }" :modal="true">
+                    <template v-if="selectedAnnouncement">
+                        <p class="text-lg font-bold">{{ selectedAnnouncement.title }}</p>
+                        <p class="text-sm text-gray-500">{{ selectedAnnouncement.date }}</p>
+                        <p class="mt-4 leading-normal">{{ selectedAnnouncement.content }}</p>
+                    </template>
+                    <template #footer>
+                        <Button label="Close" @click="closeDialog" />
+                    </template>
+                </Dialog>
             </div>
-            <!-- <div class="card">
-                <div class="flex justify-between items-center mb-6">
-                    <div class="font-semibold text-xl">Best Selling Products</div>
-                    <div>
-                        <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="$refs.menu2.toggle($event)"></Button>
-                        <Menu ref="menu2" :popup="true" :model="items" class="!min-w-40"></Menu>
-                    </div>
-                </div>
-                <ul class="list-none p-0 m-0">
-                    <li class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                        <div>
-                            <span class="text-surface-900 dark:text-surface-0 font-medium mr-2 mb-1 md:mb-0">Space T-Shirt</span>
-                            <div class="mt-1 text-muted-color">Clothing</div>
-                        </div>
-                        <div class="mt-2 md:mt-0 flex items-center">
-                            <div class="bg-surface-300 dark:bg-surface-500 rounded-border overflow-hidden w-40 lg:w-24" style="height: 8px">
-                                <div class="bg-orange-500 h-full" style="width: 50%"></div>
-                            </div>
-                            <span class="text-orange-500 ml-4 font-medium">%50</span>
-                        </div>
-                    </li>
-                    <li class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                        <div>
-                            <span class="text-surface-900 dark:text-surface-0 font-medium mr-2 mb-1 md:mb-0">Portal Sticker</span>
-                            <div class="mt-1 text-muted-color">Accessories</div>
-                        </div>
-                        <div class="mt-2 md:mt-0 ml-0 md:ml-20 flex items-center">
-                            <div class="bg-surface-300 dark:bg-surface-500 rounded-border overflow-hidden w-40 lg:w-24" style="height: 8px">
-                                <div class="bg-cyan-500 h-full" style="width: 16%"></div>
-                            </div>
-                            <span class="text-cyan-500 ml-4 font-medium">%16</span>
-                        </div>
-                    </li>
-                    <li class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                        <div>
-                            <span class="text-surface-900 dark:text-surface-0 font-medium mr-2 mb-1 md:mb-0">Supernova Sticker</span>
-                            <div class="mt-1 text-muted-color">Accessories</div>
-                        </div>
-                        <div class="mt-2 md:mt-0 ml-0 md:ml-20 flex items-center">
-                            <div class="bg-surface-300 dark:bg-surface-500 rounded-border overflow-hidden w-40 lg:w-24" style="height: 8px">
-                                <div class="bg-pink-500 h-full" style="width: 67%"></div>
-                            </div>
-                            <span class="text-pink-500 ml-4 font-medium">%67</span>
-                        </div>
-                    </li>
-                    <li class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                        <div>
-                            <span class="text-surface-900 dark:text-surface-0 font-medium mr-2 mb-1 md:mb-0">Wonders Notebook</span>
-                            <div class="mt-1 text-muted-color">Office</div>
-                        </div>
-                        <div class="mt-2 md:mt-0 ml-0 md:ml-20 flex items-center">
-                            <div class="bg-surface-300 dark:bg-surface-500 rounded-border overflow-hidden w-40 lg:w-24" style="height: 8px">
-                                <div class="bg-green-500 h-full" style="width: 35%"></div>
-                            </div>
-                            <span class="text-primary ml-4 font-medium">%35</span>
-                        </div>
-                    </li>
-                    <li class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                        <div>
-                            <span class="text-surface-900 dark:text-surface-0 font-medium mr-2 mb-1 md:mb-0">Mat Black Case</span>
-                            <div class="mt-1 text-muted-color">Accessories</div>
-                        </div>
-                        <div class="mt-2 md:mt-0 ml-0 md:ml-20 flex items-center">
-                            <div class="bg-surface-300 dark:bg-surface-500 rounded-border overflow-hidden w-40 lg:w-24" style="height: 8px">
-                                <div class="bg-purple-500 h-full" style="width: 75%"></div>
-                            </div>
-                            <span class="text-purple-500 ml-4 font-medium">%75</span>
-                        </div>
-                    </li>
-                    <li class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                        <div>
-                            <span class="text-surface-900 dark:text-surface-0 font-medium mr-2 mb-1 md:mb-0">Robots T-Shirt</span>
-                            <div class="mt-1 text-muted-color">Clothing</div>
-                        </div>
-                        <div class="mt-2 md:mt-0 ml-0 md:ml-20 flex items-center">
-                            <div class="bg-surface-300 dark:bg-surface-500 rounded-border overflow-hidden w-40 lg:w-24" style="height: 8px">
-                                <div class="bg-teal-500 h-full" style="width: 40%"></div>
-                            </div>
-                            <span class="text-teal-500 ml-4 font-medium">%40</span>
-                        </div>
-                    </li>
-                </ul>
-            </div> -->
         </div>
         <div class="col-span-12 xl:col-span-6">
             <div class="card">
@@ -337,68 +316,36 @@ watch([getPrimary, getSurface, isDarkTheme], () => {
                         <Menu ref="menu1" :popup="true" :model="items" class="!min-w-40"></Menu>
                     </div>
                 </div>
-
-                <!-- 알람 뭘 어떤 걸 넣어야할지 모르겠어서 일단 이렇게라도 넣었슴다...ㅎ -->
-                <span class="block text-muted-color font-medium mb-4">RECENT</span>
                 <ul class="p-0 mx-0 mt-0 mb-6 list-none">
-                    <li class="flex items-center py-2 border-b border-surface">
-                        <div class="w-12 h-12 flex items-center justify-center bg-blue-100 dark:bg-blue-400/10 rounded-full mr-4 shrink-0">
-                            <i class="pi pi-dollar !text-xl text-blue-500"></i>
+                    <li v-for="item in notifications" :key="item.id" class="flex items-center py-2 border-b border-surface cursor-pointer" @click="openModal(item)">
+                        <div :class="['w-12 h-12 flex items-center justify-center rounded-full mr-4 shrink-0', item.bgColor]">
+                        <OverlayBadge severity="danger">
+                            <i :class="item.iconClass" :style="{ fontSize: '1.5rem' }"></i>
+                        </OverlayBadge>
                         </div>
-                        <span class="text-surface-900 dark:text-surface-0 leading-normal"
-                            >휴가 신청 알림 : 
-                            <span class="text-surface-700 dark:text-surface-100">2명 (이은서, 홍석민)</span>
+                        <span class="text-surface-900 dark:text-surface-0 leading-normal">
+                        {{ item.text }}<br>
                         </span>
                     </li>
-                    <li class="flex items-center py-2">
-                        <div class="w-12 h-12 flex items-center justify-center bg-orange-100 dark:bg-orange-400/10 rounded-full mr-4 shrink-0">
-                            <i class="pi pi-download !text-xl text-orange-500"></i>
+                    <!-- 더보기 버튼 -->
+                    <li v-if="!showMore" class="flex items-center py-2 cursor-pointer" @click="toggleShowMore">
+                        <div class="w-full h-12 flex items-center justify-center">
+                        <span class="text-blue-500 text-center">
+                            더보기
+                        </span>
                         </div>
-                        <span class="text-surface-700 dark:text-surface-100 leading-normal">조퇴 신청자 : 2명 (김태영, 김종원)</span>
                     </li>
                 </ul>
 
-                <span class="block text-muted-color font-medium mb-4">TODAY</span>
-                <ul class="p-0 m-0 list-none mb-6">
-                    <li class="flex items-center py-2 border-b border-surface">
-                        <div class="w-12 h-12 flex items-center justify-center bg-blue-100 dark:bg-blue-400/10 rounded-full mr-4 shrink-0">
-                            <i class="pi pi-dollar !text-xl text-blue-500"></i>
-                        </div>
-                        <span class="text-surface-900 dark:text-surface-0 leading-normal"
-                            >출결 상황 : 
-                            <span class="text-surface-700 dark:text-surface-100">30 / 32</span>
-                        </span>
-                    </li>
-                    <li class="flex items-center py-2 border-b border-surface">
-                        <div class="w-12 h-12 flex items-center justify-center bg-pink-100 dark:bg-pink-400/10 rounded-full mr-4 shrink-0">
-                            <i class="pi pi-question !text-xl text-pink-500"></i>
-                        </div>
-                        <span class="text-surface-900 dark:text-surface-0 leading-normal"
-                            >병가 신청자 : 
-                            <span class="text-surface-700 dark:text-surface-100">1명 : (조은희)</span>
-                        </span>
-                    </li>
-                </ul>
-                <span class="block text-muted-color font-medium mb-4">YESTERDAY</span>
-                <ul class="p-0 m-0 list-none">
-                    <li class="flex items-center py-2 border-b border-surface">
-                        <div class="w-12 h-12 flex items-center justify-center bg-green-100 dark:bg-green-400/10 rounded-full mr-4 shrink-0">
-                            <i class="pi pi-arrow-up !text-xl text-green-500"></i>
-                        </div>
-                        <span class="text-surface-900 dark:text-surface-0 leading-normal">출결 상황 : 31 / 32</span>
-                    </li>
-                    <li class="flex items-center py-2 border-b border-surface">
-                        <div class="w-12 h-12 flex items-center justify-center bg-purple-100 dark:bg-purple-400/10 rounded-full mr-4 shrink-0">
-                            <i class="pi pi-heart !text-xl text-purple-500"></i>
-                        </div>
-                        <span class="text-surface-900 dark:text-surface-0 leading-normal">휴가 신청자 : 1명 (이은서)</span>
-                    </li>
-                </ul>
+                <!-- 모달 다이얼로그 -->
+                <Dialog header="승인/거부" v-model:visible="alarmDisplayDialog" :style="{ width: '30vw' }" modal>
+                    <p>선택된 항목: {{ selectedNotification?.text }}</p>
+                    <div class="flex justify-end gap-2 mt-4">
+                        <Button label="승인" icon="pi pi-check" @click="approve" class="p-button-success" />
+                        <Button label="거부" icon="pi pi-times" @click="reject" class="p-button-danger" />
+                    </div>
+                </Dialog>
             </div>
-            <!-- <div class="card">
-                <div class="font-semibold text-xl mb-4">Revenue Stream</div>
-                <Chart type="bar" :data="chartData" :options="chartOptions" class="h-80" />
-            </div> -->
         </div>
     </div> 
 </template>
