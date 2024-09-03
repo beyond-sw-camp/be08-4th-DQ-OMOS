@@ -7,9 +7,19 @@ const { getPrimary, getSurface, isDarkTheme } = useLayout();
 
 // const products = ref(null);
 const products = ref([]);
+const display = ref(false);
+const product = ref({});
 const chartData = ref(null);
 const chartOptions = ref(null);
 const currentDate = ref(new Date().toLocaleString());
+
+function open() {
+    display.value = true;
+}
+
+function close() {
+    display.value = false;
+}
 
 const updateDate = () => {
     currentDate.value = new Date().toLocaleString();
@@ -21,33 +31,33 @@ const items = ref([
 ]);
 
 
-// onMounted(() => {
-//     ProductService.getProductsSmall().then((data) => {        
-//         products.value = data;
-//         // 특정 Title 값을 변경
-//         const titles = [
-//             '특강 일정 안내', 
-//             '출결 공지', 
-//             '휴가 신청 안내', 
-//             '조퇴 처리 기준', 
-//             '병결 증명서 제출'
-//         ];
-
-//         // 최대 5개의 Title을 설정
-//         for (let i = 0; i < products.value.length && i < titles.length; i++) {
-//             products.value[i].Title = titles[i];
-//         }
-
-//     });
-//     chartData.value = setChartData();
-//     chartOptions.value = setChartOptions();
-// });
-
 onMounted(() => {
-    ProductService.getProductsSmall().then((data) => (products.value = data));
+    ProductService.getProductsSmall().then((data) => {        
+        products.value = data;
+        // 특정 Title 값을 변경
+        const titles = [
+            '특강 일정 안내', 
+            '출결 공지', 
+            '휴가 신청 안내', 
+            '조퇴 처리 기준', 
+            '병결 증명서 제출'
+        ];
+
+        // 최대 5개의 Title을 설정
+        for (let i = 0; i < products.value.length && i < titles.length; i++) {
+            products.value[i].Title = titles[i];
+        }
+
+    });
     chartData.value = setChartData();
     chartOptions.value = setChartOptions();
 });
+
+// onMounted(() => {
+//     ProductService.getProductsSmall().then((data) => (products.value = data));
+//     chartData.value = setChartData();
+//     chartOptions.value = setChartOptions();
+// });
 
 function setChartData() {
     const documentStyle = getComputedStyle(document.documentElement);
@@ -117,6 +127,12 @@ function setChartOptions() {
             }
         }
     };
+}
+
+function openNew() {
+    product.value = {};
+    submitted.value = false;
+    productDialog.value = true;
 }
 
 // const formatCurrency = (value) => {
@@ -198,16 +214,32 @@ watch([getPrimary, getSurface, isDarkTheme], () => {
             <div class="card">
                 <div class="font-semibold text-xl mb-4">공지사항</div>
                 <DataTable :value="products" :rows="5" :paginator="true" responsiveLayout="scroll">
-                    <Column class="Type" field="Type" header="Type" :sortable="true" style="width: 35%"></Column>
+                    <Column class="Type" field="Type" header="Type" :sortable="true" style="width: 35%">
+                        <template #body="slotProps">
+                            <!-- <span>{{ formatTitle(slotProps.data.price) }}</span> -->
+                            <!-- <span>{{ ProductService.titles }}</span> -->
+                            <span>{{ slotProps.data.Title }}</span>
+                        </template>
+                    </Column>
                     <Column field="Title" header="Title" style="width: 35%">
                         <template #body="slotProps">
-                            <span>{{ formatTitle(slotProps.data.price) }}</span>
+                            <!-- <span>{{ formatTitle(slotProps.data.price) }}</span> -->
+                            <!-- <span>{{ ProductService.titles }}</span> -->
+                            <span>{{ slotProps.data.Title }}</span>
                         </template>
                     </Column>
 
                     <Column style="width: 15%" header="View">
                         <template #body>
-                            <Button icon="pi pi-search" type="button" class="p-button-text"></Button>
+                            <Dialog header="공지사항" v-model:visible="display" :breakpoints="{ '960px': '75vw' }" :style="{ width: '30vw' }" :modal="true">
+                                <p class="leading-normal m-0">
+                                    공지사항1
+                                </p>
+                                <template #footer>
+                                    <Button label="Save" @click="close" />
+                                </template>
+                            </Dialog>
+                            <Button icon="pi pi-search" type="button" class="p-button-text" @click="open"></Button>
                         </template>
                     </Column>
                 </DataTable>
@@ -314,7 +346,7 @@ watch([getPrimary, getSurface, isDarkTheme], () => {
                             <i class="pi pi-dollar !text-xl text-blue-500"></i>
                         </div>
                         <span class="text-surface-900 dark:text-surface-0 leading-normal"
-                            >휴가 신청자 : 
+                            >휴가 신청 알림 : 
                             <span class="text-surface-700 dark:text-surface-100">2명 (이은서, 홍석민)</span>
                         </span>
                     </li>
