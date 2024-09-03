@@ -11,7 +11,7 @@ onMounted(() => {
 const toast = useToast();
 const dt = ref();
 const students = ref([]);
-const studentDialog = ref(false);
+const approveStudentDialog = ref(false);  // 승인 다이얼로그 변수
 const deleteStudentDialog = ref(false);
 const deleteStudentsDialog = ref(false);
 const student = ref({});
@@ -21,45 +21,44 @@ const filters = ref({
 });
 const submitted = ref(false);
 const attendanceStatuses = ref([
-    { label: 'Present', value: 'present' },
-    { label: 'Absent', value: 'absent' },
-    { label: 'Late', value: 'late' },
-    { label: 'Excused', value: 'excused' }
+    { label: '휴가', value: '휴가' },
+    { label: '조퇴', value: '조퇴' },
+    { label: '병가', value: '병가' }
 ]);
 
 function openNew() {
     student.value = {};
     submitted.value = false;
-    studentDialog.value = true;
+    approveStudentDialog.value = true;
 }
 
 function hideDialog() {
-    studentDialog.value = false;
+    approveStudentDialog.value = false;
     submitted.value = false;
 }
 
-function saveStudent() {
+function approveStudent() {
     submitted.value = true;
 
     if (student?.value.name?.trim()) {
         if (student.value.id) {
             student.value.attendanceStatus = student.value.attendanceStatus.value ? student.value.attendanceStatus.value : student.value.attendanceStatus;
             students.value[findIndexById(student.value.id)] = student.value;
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Student Updated', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Student Approved', life: 3000 });
         } else {
             student.value.id = createId();
             students.value.push(student.value);
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Student Added', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Student Approved', life: 3000 });
         }
 
-        studentDialog.value = false;
+        approveStudentDialog.value = false;
         student.value = {};
     }
 }
 
 function editStudent(stu) {
     student.value = { ...stu };
-    studentDialog.value = true;
+    approveStudentDialog.value = true;
 }
 
 function confirmDeleteStudent(stu) {
@@ -74,8 +73,16 @@ function deleteStudent() {
     toast.add({ severity: 'success', summary: 'Successful', detail: 'Student Deleted', life: 3000 });
 }
 
+function confirmApproveSelected() {
+    selectedStudents.value.forEach(stu => {
+        stu.attendanceStatus = 'Approved';  // 승인 상태로 변경
+    });
+    toast.add({ severity: 'success', summary: 'Approved', detail: 'Selected Students Approved', life: 3000 });
+    selectedStudents.value = [];
+}
+
 function findIndexById(id) {
-    return students.value.findIndex(student => student.id === id);
+    return students.value.findIndex((student) => student.id === id);
 }
 
 function createId() {
@@ -104,17 +111,17 @@ function deleteSelectedStudents() {
 
 function getStatusLabel(status) {
     switch (status) {
-        case 'present':
-            return 'success';
+        case '휴가':
+            return 'info';
 
-        case 'absent':
+        case '조퇴':
+            return 'warning';
+
+        case '병가':
             return 'danger';
 
-        case 'late':
-            return 'warn';
-
-        case 'excused':
-            return 'info';
+        case 'Approved':
+            return 'success';
 
         default:
             return null;
@@ -128,7 +135,8 @@ function getStatusLabel(status) {
             <Toolbar class="mb-6">
                 <template #start>
                     <Button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" @click="openNew" />
-                    <Button label="Delete" icon="pi pi-trash" severity="secondary" @click="confirmDeleteSelected" :disabled="!selectedStudents || !selectedStudents.length" />
+                    <Button label="Approve" icon="pi pi-check" severity="success" @click="confirmApproveSelected" :disabled="!selectedStudents || !selectedStudents.length" />
+                    <Button label="Delete" icon="pi pi-trash" severity="danger" @click="confirmDeleteSelected" :disabled="!selectedStudents || !selectedStudents.length" />
                 </template>
 
                 <template #end>
@@ -170,14 +178,14 @@ function getStatusLabel(status) {
                 </Column>
                 <Column :exportable="false" style="min-width: 12rem">
                     <template #body="slotProps">
-                        <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editStudent(slotProps.data)" />
+                        <Button icon="pi pi-check" outlined rounded class="mr-2" @click="editStudent(slotProps.data)" />
                         <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeleteStudent(slotProps.data)" />
                     </template>
                 </Column>
             </DataTable>
         </div>
 
-        <Dialog v-model:visible="studentDialog" :style="{ width: '450px' }" header="Student Details" :modal="true">
+        <Dialog v-model:visible="approveStudentDialog" :style="{ width: '450px' }" header="Approve Student" :modal="true">
             <div class="flex flex-col gap-6">
                 <div>
                     <label for="name" class="block font-bold mb-3">Name</label>
@@ -196,7 +204,7 @@ function getStatusLabel(status) {
 
             <template #footer>
                 <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-                <Button label="Save" icon="pi pi-check" @click="saveStudent" />
+                <Button label="Approve" icon="pi pi-check" severity="success" @click="approveStudent" />
             </template>
         </Dialog>
 
