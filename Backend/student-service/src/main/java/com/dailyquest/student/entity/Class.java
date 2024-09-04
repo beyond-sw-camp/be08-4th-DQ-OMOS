@@ -28,8 +28,8 @@ public class Class {
     private String teacher; // 강사 이름
 
     @Column(name = "open_dt", nullable = false)
-    private LocalDate openDt;
+    private LocalDate openDt; // 개강일
 
     @Column(name = "close_dt", nullable = false)
-    private LocalDate closeDt;
+    private LocalDate closeDt; // 종강일
 }

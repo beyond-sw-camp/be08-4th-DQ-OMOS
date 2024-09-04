@@ -3,9 +3,9 @@ spring:
     name: student-service
 
   datasource:
-    url: jdbc:mariadb://localhost:3306/testdb
-    username: root
-    password: 1234
+    url: jdbc:mariadb://121.170.161.72:30028/testdb
+    username: beyond
+    password: beyond
     driver-class-name: org.mariadb.jdbc.Driver
 
   jpa:
