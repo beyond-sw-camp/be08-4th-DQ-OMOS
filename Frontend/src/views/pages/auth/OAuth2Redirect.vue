@@ -17,7 +17,7 @@ const authStore = useAuthStore();
 
 const OAuth2JwtHeaderFetch = async () => {
   try {
-    const response = await fetch("http://localhost:8080/oauth2-jwt-header", {
+    const response = await fetch("http://localhost:31001/oauth2-jwt-header", {
       method: "POST",
       credentials: "include",
     });
@@ -37,11 +37,11 @@ const OAuth2JwtHeaderFetch = async () => {
       router.replace('/');
     } else {
       alert('접근할 수 없는 페이지입니다.');
-      router.replace('/login');
+      router.replace('/');
     }
   } catch (error) {
     console.log("error: ", error);
-    router.replace('/login');
+    router.replace('/');
   }
 };
 

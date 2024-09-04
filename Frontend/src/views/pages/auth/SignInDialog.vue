@@ -68,10 +68,12 @@ const handleSignIn = async () => {
     const response = await authService.login(email.value, password.value);
     if (response.success) {
 
-      // Pinia 스토어 업데이트
       authStore.setIsLoggedIn(true);
       authStore.setLoginUser(response.email);
       authStore.setAccessToken(window.localStorage.getItem('access'));
+
+      console.log(authStore.isLoggedIn);
+      console.log(authStore.userEmail);
 
       closeDialog();
       alert('로그인 성공!');

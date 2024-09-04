@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'http://localhost:31001';
 
 const register = async (email, name, password) => {
   const formData = new FormData();
@@ -30,7 +30,7 @@ const login = async (username, password) => {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      withCredentials: true, // This will send cookies along with the request
+      withCredentials: true,
     });
 
     if (response.status === 200) {

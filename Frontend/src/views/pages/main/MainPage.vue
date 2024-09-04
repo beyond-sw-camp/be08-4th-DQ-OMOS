@@ -5,6 +5,7 @@ import { onMounted, ref, watch, onUnmounted } from 'vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import OverlayBadge from 'primevue/overlaybadge';
+import authService from '@/service/authService';
 
 const alarmDisplayDialog = ref(false);
 const selectedNotification = ref(null);
@@ -113,6 +114,7 @@ const items = ref([
 ]);
 
 onMounted(() => {
+    
     ProductService.getProductsSmall().then((data) => (products.value = data));
     chartData.value = setChartData();
     chartOptions.value = setChartOptions();
