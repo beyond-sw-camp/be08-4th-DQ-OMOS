@@ -17,10 +17,10 @@ public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "student_no")
-    private long studentNo; // 학생 번호
+    private Long studentNo; // 학생 번호
 
     @Column(name = "class_no", nullable = false)
-    private long classNo; // 클래스 번호
+    private Long classNo; // 클래스 번호
 
     @Column(name = "email", nullable = false, unique = true)
     private String email; // 이메일

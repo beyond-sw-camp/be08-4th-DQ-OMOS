@@ -19,7 +19,7 @@ public class Class {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "class_no")
-    private long classNo; // 클래스 번호
+    private Long classNo; // 클래스 번호
 
     @Column(name = "name", nullable = false)
     private String name; // 클래스 이름
