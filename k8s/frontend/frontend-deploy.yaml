@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deploy
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: frontend-label
+  template:
+    metadata:
+      labels:
+        app: frontend-label
+    spec:
+      containers:
+      - name: frontend-omos
+        image: frontend-omos:1.0
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits:
+            memory: "256Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 80
