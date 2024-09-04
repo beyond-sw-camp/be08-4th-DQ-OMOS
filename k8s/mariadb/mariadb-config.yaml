@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-config
+# 사용하려는 환경 설정 값을 넣어준다.
+data:
+  TIME_ZONE: Asia/Seoul
