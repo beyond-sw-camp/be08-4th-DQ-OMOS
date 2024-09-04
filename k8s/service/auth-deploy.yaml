@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: auth-label
+  template:
+    metadata:
+      labels:
+        app: auth-label
+    spec:
+      containers:
+      - name: auth
+        image: auth-service:1.0
+        resources:
+          # 최소 사양
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          # 최대 사양
+          limits:
+            memory: "256Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 9000
