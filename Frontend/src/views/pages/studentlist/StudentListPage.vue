@@ -17,7 +17,7 @@ const loading1 = ref(true);
 const selectedStudent = ref(null);
 const displayDialog = ref(false);
 const classNames = ref([]);
-const selectedClass = ref(null);
+const selectedClass = ref(null); // 선택된 클래스 상태 관리
 
 // API 호출하여 학생 데이터 가져오기
 async function fetchStudentList() {
@@ -51,7 +51,12 @@ async function fetchClassNames() {
 }
 
 function filterByClass(className) {
-    selectedClass.value = className;
+    // 선택된 클래스가 다시 클릭되면 필터 해제
+    if (selectedClass.value === className) {
+        selectedClass.value = null; // 필터 초기화
+    } else {
+        selectedClass.value = className; // 선택된 클래스로 필터 설정
+    }
     fetchStudentList(); // 선택된 클래스에 따라 학생 데이터를 새로 불러옵니다.
 }
 
@@ -63,7 +68,7 @@ function initFilters1() {
         email: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         phone: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         classNo: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-        className: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] }, // 정확히 일치하는 값을 필터링
+        className: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
         teacher: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         openDt: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
         closeDt: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] }
@@ -77,12 +82,10 @@ function showStudentDetails(event) {
 }
 
 function formatDate(date) {
-    // 예제 포맷, 실제 포맷은 필요에 따라 수정
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 }
 
 function getSeverity(status) {
-    // 예제 구현, 실제 상태에 따라 수정
     return status === 'Active' ? 'success' : 'warning';
 }
 
@@ -114,7 +117,7 @@ onBeforeMount(() => {
             <template #header>
                 <div class="flex justify-between items-center">
                     <div class="flex gap-2">
-                        <Button v-for="className in classNames" :key="className" type="button" :label="className" outlined @click="filterByClass(className)" />
+                        <Button v-for="className in classNames" :key="className" type="button" :label="className" outlined :class="{ active: selectedClass === className }" @click="filterByClass(className)" />
                     </div>
                     <div class="relative search-container">
                         <i class="pi pi-search search-icon" />
@@ -177,13 +180,20 @@ onBeforeMount(() => {
 
 .search-icon {
     position: absolute;
-    left: 10px; /* Adjust this value to position the icon */
+    left: 10px;
     top: 50%;
     transform: translateY(-50%);
-    color: #888; /* Optional: Adjust color */
+    color: #888;
 }
 
 .search-container input {
-    padding-left: 2rem; /* Adjust padding to make space for the icon */
+    padding-left: 2rem;
+}
+
+/* 선택된 버튼 스타일 */
+.active {
+    background-color: #a7f3d0; /* 원하는 색상으로 변경하세요 */
+    color: #10b981;
+    border-color: #a7f3d0;
 }
 </style>
