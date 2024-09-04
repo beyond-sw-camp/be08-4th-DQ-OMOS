@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calendar-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: calendar-label
+  template:
+    metadata:
+      labels:
+        app: calendar-label
+    spec:
+      containers:
+      - name: calendar
+        image: calendar-service:1.0
+        resources:
+          # 최소 사양
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          # 최대 사양
+          limits:
+            memory: "256Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 9000
