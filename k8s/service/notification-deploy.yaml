@@ -1,26 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend-deploy
+  name: notification-deploy
 spec:
-  replicas: 1
-  selector: 
+  replicas: 3
+  selector:
     matchLabels:
-      app: frontend-label
+      app: notification-label
   template:
     metadata:
       labels:
-        app: frontend-label
+        app: notification-label
     spec:
       containers:
-      - name: frontend-omos
-        image: frontend-omos:1.0
+      - name: notification
+        image: notification-service:1.0
         resources:
+          # 최소 사양
           requests:
             memory: "128Mi"
             cpu: "500m"
+          # 최대 사양
           limits:
             memory: "256Mi"
             cpu: "1000m"
         ports:
-        - containerPort: 80
+        - containerPort: 9000
