@@ -4,7 +4,7 @@ metadata:
   name: frontend-deploy
 spec:
   replicas: 1
-  selector: 
+  selector:
     matchLabels:
       app: frontend-label
   template:
@@ -13,14 +13,7 @@ spec:
         app: frontend-label
     spec:
       containers:
-      - name: frontend-omos
+      - name: frontend
         image: jjjwww8802/frontend:latest
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "500m"
-          limits:
-            memory: "256Mi"
-            cpu: "1000m"
         ports:
         - containerPort: 80
