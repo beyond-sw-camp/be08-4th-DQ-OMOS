@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: jjjwww8802/frontend:latest
+        image: frontend:1.1
         ports:
         - containerPort: 80
