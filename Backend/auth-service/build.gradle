@@ -29,7 +29,6 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
     implementation 'io.swagger.core.v3:swagger-annotations:2.2.22'
     implementation 'org.springframework.boot:spring-boot-starter-mail:3.3.2'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     implementation 'org.springframework.boot:spring-boot-starter-quartz'
     testImplementation 'org.springframework.batch:spring-batch-test'

@@ -5,3 +5,6 @@ metadata:
 # 사용하려는 환경 설정 값을 넣어준다.
 data:
   TIME_ZONE: Asia/Seoul
+  my.cnf: |
+    [mysqld]
+    max_connections = 200
