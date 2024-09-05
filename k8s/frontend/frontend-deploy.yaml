@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend-omos
-        image: frontend-omos:1.0
+        image: jjjwww8802/frontend:latest
         resources:
           requests:
             memory: "128Mi"
