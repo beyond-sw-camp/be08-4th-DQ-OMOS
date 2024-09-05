@@ -7,6 +7,6 @@ spec:
   selector:
     app: student-label
   ports:
-  - port: 9003
-    targetPort: 9003
+  - port: 8080
+    targetPort: 8080
     nodePort: 31003

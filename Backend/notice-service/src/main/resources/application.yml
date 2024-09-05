@@ -3,7 +3,7 @@ spring:
     name: notice
 
   datasource:
-    url: jdbc:mariadb://121.170.161.72:30028/testdb
+    url: jdbc:mariadb://120.50.90.161:30028/testdb
     username: beyond
     password: beyond
     driver-class-name: org.mariadb.jdbc.Driver

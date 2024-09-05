@@ -7,6 +7,6 @@ spec:
   selector:
     app: notice-label
   ports:
-  - port: 9002
-    targetPort: 9002
+  - port: 8080
+    targetPort: 8080
     nodePort: 31002

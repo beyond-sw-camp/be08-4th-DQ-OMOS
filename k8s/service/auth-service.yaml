@@ -7,6 +7,6 @@ spec:
   selector:
     app: auth-label
   ports:
-  - port: 9001
-    targetPort: 9001
+  - port: 8080
+    targetPort: 8080
     nodePort: 31001

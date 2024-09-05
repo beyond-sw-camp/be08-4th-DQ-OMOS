@@ -7,6 +7,6 @@ spec:
   selector:
     app: notification-label
   ports:
-  - port: 9005
-    targetPort: 9005
+  - port: 8080
+    targetPort: 8080
     nodePort: 31005
