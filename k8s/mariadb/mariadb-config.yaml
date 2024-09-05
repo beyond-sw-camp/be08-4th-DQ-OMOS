@@ -7,4 +7,6 @@ data:
   TIME_ZONE: Asia/Seoul
   my.cnf: |
     [mysqld]
-    max_connections = 200
+    max_connections = 1000
+    character-set-server=utf8mb4
+    collation-server=utf8mb4_unicode_ci

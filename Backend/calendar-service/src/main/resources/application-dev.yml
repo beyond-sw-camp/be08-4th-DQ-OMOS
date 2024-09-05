@@ -1,8 +1,0 @@
-server:
-  port: 9004
-logging:
-  level:
-    '[org.springframework.web]': debug
-    '[org.springframework.orm.jpa]': debug
-    '[org.hibernate.SQL]': debug
-    '[org.hibernate.type]': trace

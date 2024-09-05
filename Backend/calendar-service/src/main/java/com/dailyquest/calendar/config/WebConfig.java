@@ -1,4 +1,4 @@
-package com.dailyquest.auth.config;
+package com.dailyquest.calendar.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
