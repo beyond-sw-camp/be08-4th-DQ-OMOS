@@ -35,7 +35,13 @@ spec:
         volumeMounts:
         - mountPath: /var/lib/mysql
           name: mariadb-volume
+        - mountPath: /etc/mysql/my.cnf
+          name: mariadb-config
+          subPath: my.cnf
       volumes:
       - name: mariadb-volume
         persistentVolumeClaim:
           claimName: mariadb-pvc
+      - name: mariadb-config
+        configMap:
+          name: mariadb-config

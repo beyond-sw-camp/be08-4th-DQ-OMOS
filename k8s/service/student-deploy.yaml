@@ -14,15 +14,6 @@ spec:
     spec:
       containers:
       - name: student
-        image: student-service:1.0
-        resources:
-          # 최소 사양
-          requests:
-            memory: "128Mi"
-            cpu: "500m"
-          # 최대 사양
-          limits:
-            memory: "256Mi"
-            cpu: "1000m"
+        image: jjjwww8802/student-service:1.0
         ports:
         - containerPort: 9000
