@@ -1,0 +1,56 @@
+version: '3'
+services:
+  auth-service:
+    image: auth-service
+    ports:
+      - "9001:8080"
+    environment:
+      - DATABASE_URL=jdbc:mariadb://mariadb:3306/testdb
+    depends_on:
+      - mariadb
+
+  notice-service:
+    image: notice-service
+    ports:
+      - "9002:8080"
+    environment:
+      - DATABASE_URL=jdbc:mariadb://mariadb:3306/testdb
+    depends_on:
+      - mariadb
+
+  student-service:
+    image: student-service
+    ports:
+      - "9003:8080"
+    environment:
+      - DATABASE_URL=jdbc:mariadb://mariadb:3306/testdb
+    depends_on:
+      - mariadb
+  
+  calendar-service:
+    image: calendar-service
+    ports:
+      - "9004:8080"
+    environment:
+      - DATABASE_URL=jdbc:mariadb://mariadb:3306/testdb
+    depends_on:
+      - mariadb
+
+  notification-service:
+    image: notification-service
+    ports:
+      - "9005:8080"
+    environment:
+      - DATABASE_URL=jdbc:mariadb://mariadb:3306/testdb
+    depends_on:
+      - mariadb
+
+  mariadb:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: cm9vdA==
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: beyond
+      MYSQL_PASSWORD: beyond
+    ports:
+      - "3306:3306"
