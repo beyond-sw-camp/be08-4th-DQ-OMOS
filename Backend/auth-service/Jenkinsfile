@@ -51,8 +51,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // HTTPS URL로 auth-service 디렉토리만 체크아웃
-                dir('backend/auth-service') {
+                dir('Backend/auth-service') {
                     git branch: 'main',
                         url: 'https://github.com/beyond-sw-camp/be08-4th-DQ-OMOS.git'
                 }
