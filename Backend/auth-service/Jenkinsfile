@@ -39,6 +39,16 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                // Github에서 소스 코드를 체크아웃하는 단계
+                git branch: 'main', 
+                    credentialsId: 'omos_access_ssh', 
+                    url: 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
+                sh 'pwd'
+                sh 'ls -al'
+            }
+        }
         stage('Gradle Build') {
             steps {
                 container('gradle') {
@@ -91,30 +101,4 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
-                discordSend description: """
-                제목 : ${currentBuild.displayName}
-                결과 : ${currentBuild.result}
-                실행 시간 : ${currentBuild.duration / 1000}s
-                """,
-                result: currentBuild.currentResult,
-                title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공", 
-                webhookURL: "${DISCORD}"
-            }
-        }
-        failure {
-            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
-                discordSend description: """
-                제목 : ${currentBuild.displayName}
-                결과 : ${currentBuild.result}
-                실행 시간 : ${currentBuild.duration / 1000}s
-                """,
-                result: currentBuild.currentResult,
-                title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패", 
-                webhookURL: "${DISCORD}"
-            }
-        }
-    }
 }
