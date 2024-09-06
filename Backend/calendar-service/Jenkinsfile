@@ -1,0 +1,139 @@
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: calendar-service-agent
+            spec:
+              containers:
+              - name: calendar-service
+                image: eclipse-temurin:17.0.12_7-jdk
+                args:
+                - cat
+                tty: true
+                volumeMounts:
+                - mountPath: /root
+                  name: calendar-service-volume
+              - name: docker
+                image: docker:27.2.0-alpine3.20
+                args:
+                - cat
+                tty: true
+                volumeMounts:
+                - mountPath: "/var/run/docker.sock"
+                  name: docker-socket
+              - name: kubectl
+                image: gcr.io/cloud-builders/kubectl
+                args:
+                - cat
+                tty: true
+              - name: gradle
+                image: gradle:7.6.2-jdk17
+                args:
+                - cat
+                tty: true
+              volumes:
+              - name: calendar-service-volume
+                emptyDir: {}
+              - name: docker-socket
+                hostPath:
+                  path: "/var/run/docker.sock"
+            '''
+        }
+    }
+
+    environment {
+        DOCKER_IMAGE_NAME = 'jjjwww8802/calendar-service'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                dir('Backend/calendar-service') {
+                    git branch: 'main',
+                        url: 'https://github.com/beyond-sw-camp/be08-4th-DQ-OMOS.git'
+                }
+            }
+        }
+
+        stage('Gradle Build') {
+            steps {
+                container('gradle') {
+                    sh 'pwd'
+                    sh 'ls -al'
+                    sh 'gradle clean build -DskipTests'
+                    sh 'ls -al'
+                    sh 'ls -al ./build/libs'
+                }
+            }
+        }
+
+        stage('Docker Image Build & Push') {
+            steps {
+                container('docker') {
+                    script {
+                        def dockerImageTag = "${env.BUILD_NUMBER}"
+
+                        echo "DockerImageTag : ${dockerImageTag}"
+
+                        sh 'docker logout'
+                        withCredentials([usernamePassword(credentialsId: 'dockerhub_access', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                            sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                        }
+                        withEnv(["DOCKER_IMAGE_TAG=${dockerImageTag}"]) {
+                            sh 'docker build --no-cache -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG ./'
+                            sh 'docker image inspect $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
+                            sh 'docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
+                        }
+                        sh 'docker logout'
+                    }
+                }
+            }
+        }
+
+        stage('Deployment') {
+            steps {
+                container('kubectl') {
+                    script {
+                        def dockerImageTag = "${env.BUILD_NUMBER}"
+
+                        echo "DockerImageTag : ${dockerImageTag}"
+
+                        withEnv(["DOCKER_IMAGE_TAG=${dockerImageTag}"]) {
+                            sh 'kubectl set image deploy calendar-deploy calendar=$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -n default'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공", 
+                webhookURL: "${DISCORD}"
+            }
+        }
+        failure {
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패", 
+                webhookURL: "${DISCORD}"
+            }
+        }
+    }
+}
