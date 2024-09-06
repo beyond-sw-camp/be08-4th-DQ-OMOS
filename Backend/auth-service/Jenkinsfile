@@ -51,12 +51,14 @@ pipeline {
         }
         stage('Gradle Build') {
             steps {
-                container('gradle') {
-                    sh 'pwd'
-                    sh 'ls -al'
-                    sh 'gradle clean build'
-                    sh 'ls -al'
-                    sh 'ls -al ./build/libs'
+                dir('Backend/auth-service') {  // Gradle 빌드가 필요한 정확한 디렉토리
+                    container('gradle') {
+                        sh 'pwd'
+                        sh 'ls -al'
+                        sh 'gradle clean build'
+                        sh 'ls -al'
+                        sh 'ls -al ./build/libs'
+                    }
                 }
             }
         }
@@ -100,5 +102,4 @@ pipeline {
             }
         }
     }
-
 }
