@@ -17,10 +17,3 @@ spec:
         image: jjjwww8802/notice-service:1.0
         ports:
         - containerPort: 8080
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-          limits:
-            memory: "1Gi"
-            cpu: "1"
