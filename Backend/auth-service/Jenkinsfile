@@ -5,20 +5,17 @@ pipeline {
             apiVersion: v1
             kind: Pod
             metadata:
-              name: auth-service-agent
+              name: jenkins-agent
             spec:
               containers:
-              - name: auth-service
-                image: eclipse-temurin:17.0.12_7-jdk
-                args:
+              - name: gradle
+                image: gradle:7.6.2-jdk17
+                command:
                 - cat
                 tty: true
-                volumeMounts:
-                - mountPath: /root
-                  name: auth-service-volume
               - name: docker
                 image: docker:27.2.0-alpine3.20
-                args:
+                command:
                 - cat
                 tty: true
                 volumeMounts:
@@ -26,17 +23,10 @@ pipeline {
                   name: docker-socket
               - name: kubectl
                 image: gcr.io/cloud-builders/kubectl
-                args:
-                - cat
-                tty: true
-              - name: gradle
-                image: gradle:7.6.2-jdk17
-                args:
+                command:
                 - cat
                 tty: true
               volumes:
-              - name: auth-service-volume
-                emptyDir: {}
               - name: docker-socket
                 hostPath:
                   path: "/var/run/docker.sock"
@@ -51,21 +41,24 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                dir('Backend/auth-service') {
-                    git branch: 'main',
-                        url: 'https://github.com/beyond-sw-camp/be08-4th-DQ-OMOS.git'
-                }
+                // Github에서 소스 코드를 체크아웃하는 단계
+                git branch: 'main', 
+                    credentialsId: 'omos_access_ssh', 
+                    url: 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
+                sh 'pwd'
+                sh 'ls -al'
             }
         }
-
         stage('Gradle Build') {
             steps {
-                container('gradle') {
-                    sh 'pwd'
-                    sh 'ls -al'
-                    sh 'gradle clean build -DskipTests'
-                    sh 'ls -al'
-                    sh 'ls -al ./build/libs'
+                dir('Backend/auth-service') {  // Gradle 빌드가 필요한 정확한 디렉토리
+                    container('gradle') {
+                        sh 'pwd'
+                        sh 'ls -al'
+                        sh 'gradle clean build'
+                        sh 'ls -al'
+                        sh 'ls -al ./build/libs'
+                    }
                 }
             }
         }
@@ -106,33 +99,6 @@ pipeline {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    post {
-        success {
-            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
-                discordSend description: """
-                제목 : ${currentBuild.displayName}
-                결과 : ${currentBuild.result}
-                실행 시간 : ${currentBuild.duration / 1000}s
-                """,
-                result: currentBuild.currentResult,
-                title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공", 
-                webhookURL: "${DISCORD}"
-            }
-        }
-        failure {
-            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
-                discordSend description: """
-                제목 : ${currentBuild.displayName}
-                결과 : ${currentBuild.result}
-                실행 시간 : ${currentBuild.duration / 1000}s
-                """,
-                result: currentBuild.currentResult,
-                title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패", 
-                webhookURL: "${DISCORD}"
             }
         }
     }
