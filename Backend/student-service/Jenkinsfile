@@ -14,7 +14,7 @@ pipeline {
                 - cat
                 tty: true
               - name: docker
-                image: docker:27.2.0-alpine3.20
+                image: docker:latest
                 command:
                 - cat
                 tty: true
@@ -22,7 +22,7 @@ pipeline {
                 - mountPath: "/var/run/docker.sock"
                   name: docker-socket
               - name: kubectl
-                image: gcr.io/cloud-builders/kubectl
+                image: bitnami/kubectl:latest
                 command:
                 - cat
                 tty: true
@@ -41,23 +41,15 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Github에서 소스 코드를 체크아웃하는 단계
-                git branch: 'main', 
-                    credentialsId: 'omos_access_ssh', 
-                    url: 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
-                sh 'pwd'
-                sh 'ls -al'
+                git branch: 'main', credentialsId: 'omos_access_ssh', url: 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
             }
         }
+
         stage('Gradle Build') {
             steps {
                 dir('Backend/student-service') {  // Gradle 빌드가 필요한 정확한 디렉토리
                     container('gradle') {
-                        sh 'pwd'
-                        sh 'ls -al'
                         sh 'gradle clean build'
-                        sh 'ls -al'
-                        sh 'ls -al ./build/libs'
                     }
                 }
             }
@@ -65,22 +57,24 @@ pipeline {
 
         stage('Docker Image Build & Push') {
             steps {
-                container('docker') {
-                    script {
-                        def dockerImageTag = "${env.BUILD_NUMBER}"
+                dir('Backend/student-service') {  // Dockerfile이 있는 경로로 변경
+                    container('docker') {
+                        script {
+                            def dockerImageTag = "${env.BUILD_NUMBER}"
 
-                        echo "DockerImageTag : ${dockerImageTag}"
+                            echo "DockerImageTag : ${dockerImageTag}"
 
-                        sh 'docker logout'
-                        withCredentials([usernamePassword(credentialsId: 'dockerhub_access', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                            sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                            sh 'docker logout'
+                            withCredentials([usernamePassword(credentialsId: 'dockerhub_access', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                                sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                            }
+                            withEnv(["DOCKER_IMAGE_TAG=${dockerImageTag}"]) {
+                                sh 'docker build --no-cache -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG ./'
+                                sh 'docker image inspect $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
+                                sh 'docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
+                            }
+                            sh 'docker logout'
                         }
-                        withEnv(["DOCKER_IMAGE_TAG=${dockerImageTag}"]) {
-                            sh 'docker build --no-cache -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG ./'
-                            sh 'docker image inspect $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
-                            sh 'docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
-                        }
-                        sh 'docker logout'
                     }
                 }
             }
@@ -100,6 +94,15 @@ pipeline {
                     }
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo "Build and Deployment Successful"
+        }
+        failure {
+            echo "Build or Deployment Failed"
         }
     }
 }
