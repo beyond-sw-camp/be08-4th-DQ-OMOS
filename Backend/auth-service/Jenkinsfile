@@ -29,6 +29,11 @@ pipeline {
                 args:
                 - cat
                 tty: true
+              - name: gradle
+                image: gradle:7.6.2-jdk17
+                args:
+                - cat
+                tty: true
               volumes:
               - name: auth-service-volume
                 emptyDir: {}
@@ -44,7 +49,16 @@ pipeline {
     }
 
     stages {
-        // Add your stages here (e.g., Checkout, Build, etc.)
+        stage('Checkout') {
+            steps {
+                // HTTPS URL로 auth-service 디렉토리만 체크아웃
+                dir('backend/auth-service') {
+                    git branch: 'main',
+                        url: 'https://github.com/beyond-sw-camp/be08-4th-DQ-OMOS.git'
+                }
+            }
+        }
+
         stage('Gradle Build') {
             steps {
                 container('gradle') {
@@ -89,7 +103,7 @@ pipeline {
                         echo "DockerImageTag : ${dockerImageTag}"
 
                         withEnv(["DOCKER_IMAGE_TAG=${dockerImageTag}"]) {
-                            sh 'kubectl set image deploy department-deploy department=$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -n default'
+                            sh 'kubectl set image deploy auth-deploy auth=$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -n default'
                         }
                     }
                 }
