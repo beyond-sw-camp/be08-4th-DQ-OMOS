@@ -49,6 +49,7 @@ pipeline {
             steps {
                 dir('Backend/student-service') {  // Gradle 빌드가 필요한 정확한 디렉토리
                     container('gradle') {
+                        sh 'ls'
                         sh 'gradle clean build'
                     }
                 }
