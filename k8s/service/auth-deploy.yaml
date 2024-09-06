@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: auth
-        image: auth-service:1.1
+        image: jjjwww8802/auth-service:1.0
         ports:
         - containerPort: 8080

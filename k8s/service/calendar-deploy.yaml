@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: calendar
-        image: calendar-service:1.1
+        image: jjjwww8802/calendar-service:1.0
         ports:
         - containerPort: 8080
         resources:
