@@ -22,7 +22,7 @@ pipeline {
                 - mountPath: "/var/run/docker.sock"
                   name: docker-socket
               - name: kubectl
-                image: bitnami/kubectl:latest
+                image: gcr.io/cloud-builders/kubectl
                 command:
                 - cat
                 tty: true
@@ -71,7 +71,7 @@ pipeline {
                 dir('Backend/auth-service') {
                     container('gradle') {
                         sh 'chmod +x ./gradlew'
-                        sh './gradlew bootJar'
+                        sh './gradlew clean build'
                     }
                 }
             }
@@ -96,14 +96,13 @@ pipeline {
             }
         }
 
-        stage('Kubernetes Deploy') {
+        stage('Kubernetes Deployment') {
             steps {
                 container('kubectl') {
                     script {
                         def dockerImageTag = "${env.BUILD_NUMBER}"
-                        sh "kubectl set image deploy auth-deploy auth=${DOCKER_IMAGE_NAME}:${dockerImageTag} -n default --record"
-                        // 배포 상태 확인
-                        sh "kubectl rollout status deploy auth-deploy -n default"
+                        echo "DockerImageTag : ${dockerImageTag}"
+                        sh 'kubectl set image deploy auth-deploy auth=$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -n default'
                     }
                 }
             }
@@ -112,10 +111,28 @@ pipeline {
 
     post {
         success {
-            echo "Build and Deployment Successful"
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공",
+                webhookURL: "${DISCORD}"
+            }
         }
         failure {
-            echo "Build or Deployment Failed"
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패",
+                webhookURL: "${DISCORD}"
+            }
         }
     }
 }
