@@ -20,7 +20,7 @@ public class StudentController {
 
     @GetMapping("/studentList")
     public ResponseEntity<List<StudentDto>> studentList(){
-
+        System.out.println("JENKINS FILE TEST 중 입니다");
         List<StudentDto> studentDtoList = studentService.studentList();
         System.out.println("studentDtoList = " + studentDtoList);
         return ResponseEntity.ok(studentDtoList);
