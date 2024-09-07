@@ -40,6 +40,11 @@ pipeline {
         DOCKERHUB_URL = 'https://index.docker.io/v1/'
         GITHUB_URL = 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
         GITHUB_CREDENTIALS_ID = 'omos_access_ssh'
+
+        // DB 환경 변수 설정
+        DB_URL = 'jdbc:mariadb://localhost:30028/testdb'
+        DB_USERNAME = 'beyond'
+        DB_PASSWORD = 'beyond'
     }
 
     stages {
