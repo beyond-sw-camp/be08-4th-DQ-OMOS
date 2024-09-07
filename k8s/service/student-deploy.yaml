@@ -17,3 +17,19 @@ spec:
         image: jjjwww8802/student-service:1.0
         ports:
         - containerPort: 8080
+        env:
+        - name: DB_URL
+          valueFrom:
+            secretKeyRef:
+              name: auth-secret
+              key: DB_URL
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: auth-secret
+              key: DB_USERNAME
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: auth-secret
+              key: DB_PASSWORD

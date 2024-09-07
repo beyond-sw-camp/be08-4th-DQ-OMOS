@@ -9,14 +9,10 @@ pipeline {
             spec:
               containers:
               - name: gradle
-                image: gradle:7.2-jdk17
+                image: gradle:7.6.2-jdk17
                 command:
-                - cat
+                  - cat
                 tty: true
-                volumeMounts:
-                - mountPath: "/home/jenkins/agent"
-                  name: workspace-volume
-                  readOnly: false
               - name: docker
                 image: docker:latest
                 command:
@@ -25,35 +21,15 @@ pipeline {
                 volumeMounts:
                 - mountPath: "/var/run/docker.sock"
                   name: docker-socket
-                - mountPath: "/home/jenkins/agent"
-                  name: workspace-volume
-                  readOnly: false
               - name: kubectl
-                image: bitnami/kubectl:latest
+                image: gcr.io/cloud-builders/kubectl
                 command:
                 - cat
                 tty: true
-                volumeMounts:
-                - mountPath: "/home/jenkins/agent"
-                  name: workspace-volume
-                  readOnly: false
-              - name: docker-compose
-                image: docker/compose:latest
-                command:
-                - cat
-                tty: true
-                volumeMounts:
-                - mountPath: "/var/run/docker.sock"
-                  name: docker-socket
-                - mountPath: "/home/jenkins/agent"
-                  name: workspace-volume
-                  readOnly: false
               volumes:
               - name: docker-socket
                 hostPath:
                   path: "/var/run/docker.sock"
-              - name: workspace-volume
-                emptyDir: {}
             '''
         }
     }
@@ -63,7 +39,7 @@ pipeline {
         DOCKER_IMAGE_NAME = 'jjjwww8802/student-service'
         DOCKERHUB_URL = 'https://index.docker.io/v1/'
         GITHUB_URL = 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
-        GITHUB_CREDENTIALS_ID = 'omos_student_access_ssh'
+        GITHUB_CREDENTIALS_ID = 'omos_access_ssh'
     }
 
     stages {
@@ -77,12 +53,8 @@ pipeline {
             steps {
                 dir('Backend/student-service') {
                     container('gradle') {
-                        script {
-                            sh '''
-                                chmod +x ./gradlew
-                                ./gradlew clean build
-                            '''
-                        }
+                        sh 'chmod +x ./gradlew'
+                        sh './gradlew clean bootJar'
                     }
                 }
             }
@@ -94,17 +66,12 @@ pipeline {
                     container('docker') {
                         script {
                             def dockerImageTag = "${env.BUILD_NUMBER}"
-
-                            echo "DockerImageTag : ${dockerImageTag}"
-
                             sh 'docker logout'
                             withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                                 sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                             }
-
                             sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:${dockerImageTag} ."
                             sh "docker push ${DOCKER_IMAGE_NAME}:${dockerImageTag}"
-
                             sh 'docker logout'
                         }
                     }
@@ -112,28 +79,13 @@ pipeline {
             }
         }
 
-        stage('Docker Compose Up') {
-            steps {
-                dir('Backend/student-service') {
-                    container('docker-compose') {
-                        script {
-                            echo "Starting services with Docker Compose"
-                            sh 'docker-compose up -d'
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Kubernetes Deploy') {
+        stage('Kubernetes Deployment') {
             steps {
                 container('kubectl') {
                     script {
                         def dockerImageTag = "${env.BUILD_NUMBER}"
-
-                        echo "Deploying DockerImageTag : ${dockerImageTag}"
-
-                        sh "kubectl set image deploy student-deploy student=${DOCKER_IMAGE_NAME}:${dockerImageTag} -n default --record"
+                        echo "DockerImageTag : ${dockerImageTag}"
+                        sh 'kubectl set image deploy student-deploy student=$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -n default'
                     }
                 }
             }
@@ -142,13 +94,28 @@ pipeline {
 
     post {
         success {
-            echo "Build and Deployment Successful"
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공",
+                webhookURL: "${DISCORD}"
+            }
         }
         failure {
-            echo "Build or Deployment Failed"
-        }
-        always {
-            deleteDir()
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패",
+                webhookURL: "${DISCORD}"
+            }
         }
     }
 }

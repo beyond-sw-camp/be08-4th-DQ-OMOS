@@ -45,24 +45,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'develop', credentialsId: "${GITHUB_CREDENTIALS_ID}", url: "${GITHUB_URL}"
-            }
-        }
-
-        stage('Setup Environment Variables') {
-            steps {
-                withCredentials([
-                    string(credentialsId: 'DB_URL', variable: 'DB_URL'),
-                    string(credentialsId: 'DB_USERNAME', variable: 'DB_USERNAME'),
-                    string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
-                    string(credentialsId: 'NAVER_CLIENT_ID', variable: 'NAVER_CLIENT_ID'),
-                    string(credentialsId: 'NAVER_CLIENT_SECRET', variable: 'NAVER_CLIENT_SECRET'),
-                    string(credentialsId: 'GOOGLE_CLIENT_ID', variable: 'GOOGLE_CLIENT_ID'),
-                    string(credentialsId: 'GOOGLE_CLIENT_SECRET', variable: 'GOOGLE_CLIENT_SECRET'),
-                    string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET')
-                ]) {
-                    sh 'printenv'
-                }
+                git branch: 'main', credentialsId: "${GITHUB_CREDENTIALS_ID}", url: "${GITHUB_URL}"
             }
         }
 
