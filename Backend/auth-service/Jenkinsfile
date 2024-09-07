@@ -70,7 +70,7 @@ pipeline {
             steps {
                 dir('Backend/auth-service') {
                     container('gradle') {
-                        sh './gradlew clean build'  // 빌드 실행
+                        sh './gradlew clean bootJar'  // 빌드 실행
                     }
                 }
             }
