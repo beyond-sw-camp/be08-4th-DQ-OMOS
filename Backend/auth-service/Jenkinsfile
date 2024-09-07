@@ -9,9 +9,9 @@ pipeline {
             spec:
               containers:
               - name: gradle
-                image: gradle:latest
+                image: gradle:7.6.2-jdk17
                 command:
-                - cat
+                  - cat
                 tty: true
               - name: docker
                 image: docker:latest
@@ -116,9 +116,6 @@ pipeline {
         }
         failure {
             echo "Build or Deployment Failed"
-        }
-        always {
-            cleanWs()  // 작업 공간 정리 (Workspace Cleanup 플러그인 필요)
         }
     }
 }
