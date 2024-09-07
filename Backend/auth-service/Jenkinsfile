@@ -14,7 +14,7 @@ pipeline {
                 - cat
                 tty: true
               - name: docker
-                image: docker:27.2.0-alpine3.20
+                image: docker:latest
                 command:
                 - cat
                 tty: true
@@ -22,7 +22,7 @@ pipeline {
                 - mountPath: "/var/run/docker.sock"
                   name: docker-socket
               - name: kubectl
-                image: gcr.io/cloud-builders/kubectl
+                image: bitnami/kubectl:latest
                 command:
                 - cat
                 tty: true
@@ -35,29 +35,42 @@ pipeline {
     }
 
     environment {
+        DOCKER_CREDENTIALS_ID = 'dockerhub_access'
         DOCKER_IMAGE_NAME = 'jjjwww8802/auth-service'
+        DOCKERHUB_URL = 'https://index.docker.io/v1/'
+        GITHUB_URL = 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
+        GITHUB_CREDENTIALS_ID = 'omos_access_ssh'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Github에서 소스 코드를 체크아웃하는 단계
-                git branch: 'main', 
-                    credentialsId: 'omos_access_ssh', 
-                    url: 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
-                sh 'pwd'
-                sh 'ls -al'
+                git branch: 'main', credentialsId: "${GITHUB_CREDENTIALS_ID}", url: "${GITHUB_URL}"
             }
         }
+
+        stage('Setup Environment Variables') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'DB_URL', variable: 'DB_URL'),
+                    string(credentialsId: 'DB_USERNAME', variable: 'DB_USERNAME'),
+                    string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
+                    string(credentialsId: 'NAVER_CLIENT_ID', variable: 'NAVER_CLIENT_ID'),
+                    string(credentialsId: 'NAVER_CLIENT_SECRET', variable: 'NAVER_CLIENT_SECRET'),
+                    string(credentialsId: 'GOOGLE_CLIENT_ID', variable: 'GOOGLE_CLIENT_ID'),
+                    string(credentialsId: 'GOOGLE_CLIENT_SECRET', variable: 'GOOGLE_CLIENT_SECRET'),
+                    string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET')
+                ]) {
+                    sh 'printenv'
+                }
+            }
+        }
+
         stage('Gradle Build') {
             steps {
-                dir('Backend/auth-service') {  // Gradle 빌드가 필요한 정확한 디렉토리
+                dir('Backend/auth-service') {
                     container('gradle') {
-                        sh 'pwd'
-                        sh 'ls -al'
-                        sh 'gradle clean build'
-                        sh 'ls -al'
-                        sh 'ls -al ./build/libs'
+                        sh './gradlew clean build'  // 빌드 실행
                     }
                 }
             }
@@ -65,41 +78,44 @@ pipeline {
 
         stage('Docker Image Build & Push') {
             steps {
-                container('docker') {
-                    script {
-                        def dockerImageTag = "${env.BUILD_NUMBER}"
-
-                        echo "DockerImageTag : ${dockerImageTag}"
-
-                        sh 'docker logout'
-                        withCredentials([usernamePassword(credentialsId: 'dockerhub_access', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                            sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                dir('Backend/auth-service') {
+                    container('docker') {
+                        script {
+                            def dockerImageTag = "${env.BUILD_NUMBER}"
+                            sh 'docker logout'
+                            withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                                sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                            }
+                            sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:${dockerImageTag} ."
+                            sh "docker push ${DOCKER_IMAGE_NAME}:${dockerImageTag}"
+                            sh 'docker logout'
                         }
-                        withEnv(["DOCKER_IMAGE_TAG=${dockerImageTag}"]) {
-                            sh 'docker build --no-cache -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG ./'
-                            sh 'docker image inspect $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
-                            sh 'docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
-                        }
-                        sh 'docker logout'
                     }
                 }
             }
         }
 
-        stage('Deployment') {
+        stage('Kubernetes Deploy') {
             steps {
                 container('kubectl') {
                     script {
                         def dockerImageTag = "${env.BUILD_NUMBER}"
-
-                        echo "DockerImageTag : ${dockerImageTag}"
-
-                        withEnv(["DOCKER_IMAGE_TAG=${dockerImageTag}"]) {
-                            sh 'kubectl set image deploy auth-deploy auth=$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -n default'
-                        }
+                        sh "kubectl set image deploy auth-deploy auth=${DOCKER_IMAGE_NAME}:${dockerImageTag} -n default --record"
                     }
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo "Build and Deployment Successful"
+        }
+        failure {
+            echo "Build or Deployment Failed"
+        }
+        always {
+            cleanWs()  // 작업 공간 정리 (Workspace Cleanup 플러그인 필요)
         }
     }
 }
