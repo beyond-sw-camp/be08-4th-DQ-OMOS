@@ -49,8 +49,11 @@ pipeline {
             steps {
                 dir('Backend/student-service') {
                     container('gradle') {
+                        // Gradle Wrapper 버전 확인
+                        sh './gradlew --version'
                         sh 'ls'
                         sh 'chmod +x ./gradlew'
+                        sh './gradlew wrapper --gradle-version 7.6.2'
                         sh './gradlew clean build'
                     }
                 }
