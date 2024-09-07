@@ -71,7 +71,7 @@ pipeline {
                 dir('Backend/auth-service') {
                     container('gradle') {
                         sh 'chmod +x ./gradlew'
-                        sh './gradlew clean build'
+                        sh './gradlew clean bootJar'
                     }
                 }
             }
