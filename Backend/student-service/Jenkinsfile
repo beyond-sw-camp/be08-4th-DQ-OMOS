@@ -47,9 +47,9 @@ pipeline {
 
         stage('Gradle Build') {
             steps {
-                dir('Backend/student-service') {  // Gradle 빌드가 필요한 정확한 디렉토리
+                dir('Backend/student-service') {
                     container('gradle') {
-                        sh 'gradle clean build'
+                        sh './gradlew clean build'
                     }
                 }
             }
@@ -57,7 +57,7 @@ pipeline {
 
         stage('Docker Image Build & Push') {
             steps {
-                dir('Backend/student-service') {  // Dockerfile이 있는 경로로 변경
+                dir('Backend/student-service') {
                     container('docker') {
                         script {
                             def dockerImageTag = "${env.BUILD_NUMBER}"
