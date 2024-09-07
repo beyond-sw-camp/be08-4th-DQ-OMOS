@@ -9,7 +9,7 @@ pipeline {
             spec:
               containers:
               - name: gradle
-                image: gradle:7.2-jdk17
+                image: gradle:latest
                 command:
                 - cat
                 tty: true
@@ -35,7 +35,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_CREDENTIALS_ID = 'dockerhub_access'  // dockerhub 자격증명 ID
+        DOCKER_CREDENTIALS_ID = 'dockerhub_access'
         DOCKER_IMAGE_NAME = 'jjjwww8802/auth-service'
         DOCKERHUB_URL = 'https://index.docker.io/v1/'
         GITHUB_URL = 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
@@ -49,13 +49,31 @@ pipeline {
             }
         }
 
+        stage('Setup Environment Variables') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'DB_URL', variable: 'DB_URL'),
+                                     string(credentialsId: 'DB_USERNAME', variable: 'DB_USERNAME'),
+                                     string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
+                                     string(credentialsId: 'NAVER_CLIENT_ID', variable: 'NAVER_CLIENT_ID'),
+                                     string(credentialsId: 'NAVER_CLIENT_SECRET', variable: 'NAVER_CLIENT_SECRET'),
+                                     string(credentialsId: 'GOOGLE_CLIENT_ID', variable: 'GOOGLE_CLIENT_ID'),
+                                     string(credentialsId: 'GOOGLE_CLIENT_SECRET', variable: 'GOOGLE_CLIENT_SECRET'),
+                                     string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET')]) {
+                        // Set environment variables to be used in build
+                        sh 'printenv' // 확인을 위한 printenv (실제 빌드에 불필요하면 제거 가능)
+                    }
+                }
+            }
+        }
+
         stage('Gradle Build') {
             steps {
                 dir('Backend/auth-service') {
                     container('gradle') {
                         script {
-                            sh 'chmod +x ./gradlew'  // gradlew 실행 권한 부여
-                            sh './gradlew clean build'  // 빌드 실행
+                            sh 'chmod +x ./gradlew'
+                            sh './gradlew clean build'
                         }
                     }
                 }
@@ -76,7 +94,6 @@ pipeline {
                                 sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                             }
 
-                            // Docker 이미지 빌드 및 푸시
                             sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:${dockerImageTag} ."
                             sh "docker push ${DOCKER_IMAGE_NAME}:${dockerImageTag}"
 
@@ -110,7 +127,7 @@ pipeline {
             echo "Build or Deployment Failed"
         }
         always {
-            cleanWs()  // 작업 공간 정리
+            cleanWs()
         }
     }
 }
