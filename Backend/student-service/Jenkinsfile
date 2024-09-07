@@ -113,7 +113,7 @@ pipeline {
             echo "Build or Deployment Failed"
         }
         always {
-            cleanWs()  // 작업 공간 정리
+            deleteDir()  // 작업 공간 정리
         }
     }
 }
