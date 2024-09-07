@@ -9,7 +9,7 @@ pipeline {
             spec:
               containers:
               - name: gradle
-                image: gradle:latest
+                image: gradle:7.2-jdk17
                 command:
                 - cat
                 tty: true
@@ -35,13 +35,17 @@ pipeline {
     }
 
     environment {
+        DOCKER_CREDENTIALS_ID = 'dockerhub_access'  // dockerhub 자격증명 ID
         DOCKER_IMAGE_NAME = 'jjjwww8802/student-service'
+        DOCKERHUB_URL = 'https://index.docker.io/v1/'
+        GITHUB_URL = 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
+        GITHUB_CREDENTIALS_ID = 'omos_access_ssh'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', credentialsId: 'omos_access_ssh', url: 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
+                git branch: 'main', credentialsId: "${GITHUB_CREDENTIALS_ID}", url: "${GITHUB_URL}"
             }
         }
 
@@ -49,10 +53,10 @@ pipeline {
             steps {
                 dir('Backend/student-service') {
                     container('gradle') {
-                        sh 'ls'  // 경로 확인을 위한 명령
-                        sh 'chmod +x ./gradlew'  // gradlew 파일에 실행 권한 부여
-                        sh './gradlew --version'  // Gradle 버전 확인
-                        sh './gradlew clean build'  // Gradle 빌드 실행
+                        script {
+                            sh 'chmod +x ./gradlew'  // gradlew 실행 권한 부여
+                            sh './gradlew clean build'  // 빌드 실행
+                        }
                     }
                 }
             }
@@ -68,15 +72,14 @@ pipeline {
                             echo "DockerImageTag : ${dockerImageTag}"
 
                             sh 'docker logout'
-                            withCredentials([usernamePassword(credentialsId: 'dockerhub_access', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                            withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                                 sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                             }
-                            withEnv(["DOCKER_IMAGE_TAG=${dockerImageTag}"]) {
-                                // Dockerfile을 기반으로 빌드
-                                sh 'docker build --no-cache -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG .'
-                                sh 'docker image inspect $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
-                                sh 'docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
-                            }
+
+                            // Docker 이미지 빌드 및 푸시
+                            sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:${dockerImageTag} ."
+                            sh "docker push ${DOCKER_IMAGE_NAME}:${dockerImageTag}"
+
                             sh 'docker logout'
                         }
                     }
@@ -84,17 +87,15 @@ pipeline {
             }
         }
 
-        stage('Deployment') {
+        stage('Kubernetes Deploy') {
             steps {
                 container('kubectl') {
                     script {
                         def dockerImageTag = "${env.BUILD_NUMBER}"
 
-                        echo "DockerImageTag : ${dockerImageTag}"
+                        echo "Deploying DockerImageTag : ${dockerImageTag}"
 
-                        withEnv(["DOCKER_IMAGE_TAG=${dockerImageTag}"]) {
-                            sh 'kubectl set image deploy student-deploy student=$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -n default'
-                        }
+                        sh "kubectl set image deploy student-deploy student=${DOCKER_IMAGE_NAME}:${dockerImageTag} -n default --record"
                     }
                 }
             }
@@ -107,6 +108,9 @@ pipeline {
         }
         failure {
             echo "Build or Deployment Failed"
+        }
+        always {
+            cleanWs()  // 작업 공간 정리
         }
     }
 }
