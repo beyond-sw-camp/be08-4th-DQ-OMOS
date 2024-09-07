@@ -45,9 +45,16 @@ pipeline {
             }
         }
 
+        stage('Get K8s service') {
+            steps {
+                container('kubectl') {
+                    sh 'kubectl get svc'
+                }
+            }
+        }
+
         stage('Gradle Build') {
             steps {
-                // student-service 디렉토리로 이동하여 빌드
                 dir('Backend/student-service') {
                     container('gradle') {
                         sh 'ls'  // 경로 확인을 위한 명령
@@ -73,7 +80,7 @@ pipeline {
                                 sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                             }
                             withEnv(["DOCKER_IMAGE_TAG=${dockerImageTag}"]) {
-                                // 현재 디렉토리에 있는 Dockerfile을 기반으로 빌드
+                                // Dockerfile을 기반으로 빌드
                                 sh 'docker build --no-cache -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG .'
                                 sh 'docker image inspect $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
                                 sh 'docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
@@ -94,7 +101,6 @@ pipeline {
                         echo "DockerImageTag : ${dockerImageTag}"
 
                         withEnv(["DOCKER_IMAGE_TAG=${dockerImageTag}"]) {
-                            // Kubernetes 클러스터에 배포
                             sh 'kubectl set image deploy student-deploy student=$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -n default'
                         }
                     }
