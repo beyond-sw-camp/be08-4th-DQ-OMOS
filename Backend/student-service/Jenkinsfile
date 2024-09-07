@@ -39,7 +39,7 @@ pipeline {
         DOCKER_IMAGE_NAME = 'jjjwww8802/student-service'
         DOCKERHUB_URL = 'https://index.docker.io/v1/'
         GITHUB_URL = 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
-        GITHUB_CREDENTIALS_ID = 'omos_student_ssh'
+        GITHUB_CREDENTIALS_ID = 'omos_student_access_ssh'
     }
 
     stages {
