@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  student-service:
+    image: jjjwww8802/student-service:1.0
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"

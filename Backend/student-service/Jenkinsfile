@@ -26,6 +26,14 @@ pipeline {
                 command:
                 - cat
                 tty: true
+              - name: docker-compose
+                image: docker/compose:latest
+                command:
+                - cat
+                tty: true
+                volumeMounts:
+                - mountPath: "/var/run/docker.sock"
+                  name: docker-socket
               volumes:
               - name: docker-socket
                 hostPath:
@@ -84,6 +92,18 @@ pipeline {
                             sh "docker push ${DOCKER_IMAGE_NAME}:${dockerImageTag}"
 
                             sh 'docker logout'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Docker Compose Up') {
+            steps {
+                dir('Backend/student-service') {
+                    container('docker-compose') {
+                        script {
+                            sh 'docker-compose up -d'
                         }
                     }
                 }
