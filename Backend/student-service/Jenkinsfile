@@ -9,7 +9,7 @@ pipeline {
             spec:
               containers:
               - name: gradle
-                image: gradle:7.6.2-jdk17
+                image: gradle:latest
                 command:
                 - cat
                 tty: true
@@ -42,14 +42,6 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main', credentialsId: 'omos_access_ssh', url: 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
-            }
-        }
-
-        stage('Get K8s service') {
-            steps {
-                container('kubectl') {
-                    sh 'kubectl get svc'
-                }
             }
         }
 
