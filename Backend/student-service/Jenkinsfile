@@ -47,14 +47,13 @@ pipeline {
 
         stage('Gradle Build') {
             steps {
+                // student-service 디렉토리로 이동하여 빌드
                 dir('Backend/student-service') {
                     container('gradle') {
-                        // Gradle Wrapper 버전 확인
-                        sh './gradlew --version'
-                        sh 'ls'
-                        sh 'chmod +x ./gradlew'
-                        sh './gradlew wrapper --gradle-version 7.6.2'
-                        sh './gradlew clean build'
+                        sh 'ls'  // 경로 확인을 위한 명령
+                        sh 'chmod +x ./gradlew'  // gradlew 파일에 실행 권한 부여
+                        sh './gradlew --version'  // Gradle 버전 확인
+                        sh './gradlew clean build'  // Gradle 빌드 실행
                     }
                 }
             }
@@ -74,7 +73,8 @@ pipeline {
                                 sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                             }
                             withEnv(["DOCKER_IMAGE_TAG=${dockerImageTag}"]) {
-                                sh 'docker build --no-cache -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG ./'
+                                // 현재 디렉토리에 있는 Dockerfile을 기반으로 빌드
+                                sh 'docker build --no-cache -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG .'
                                 sh 'docker image inspect $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
                                 sh 'docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
                             }
@@ -94,6 +94,7 @@ pipeline {
                         echo "DockerImageTag : ${dockerImageTag}"
 
                         withEnv(["DOCKER_IMAGE_TAG=${dockerImageTag}"]) {
+                            // Kubernetes 클러스터에 배포
                             sh 'kubectl set image deploy student-deploy student=$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -n default'
                         }
                     }
