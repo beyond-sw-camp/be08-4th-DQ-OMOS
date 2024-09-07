@@ -54,8 +54,9 @@ pipeline {
                 dir('Backend/student-service') {
                     container('gradle') {
                         script {
-                            // .env 파일을 읽어 환경 변수로 설정
-                            sh 'set -o allexport; source .env; set +o allexport'
+                            sh '''
+                                bash -c "source .env && chmod +x ./gradlew && ./gradlew clean build"
+                            '''
                             sh 'chmod +x ./gradlew'  // gradlew 실행 권한 부여
                             sh './gradlew clean build'  // 빌드 실행
                         }
