@@ -11,7 +11,7 @@ pipeline {
               - name: gradle
                 image: gradle:7.6.2-jdk17
                 command:
-                - cat
+                  - cat
                 tty: true
               - name: docker
                 image: docker:latest
@@ -22,7 +22,7 @@ pipeline {
                 - mountPath: "/var/run/docker.sock"
                   name: docker-socket
               - name: kubectl
-                image: bitnami/kubectl:latest
+                image: gcr.io/cloud-builders/kubectl
                 command:
                 - cat
                 tty: true
@@ -45,7 +45,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', credentialsId: "${GITHUB_CREDENTIALS_ID}", url: "${GITHUB_URL}"
+                git branch: 'develop', credentialsId: "${GITHUB_CREDENTIALS_ID}", url: "${GITHUB_URL}"
             }
         }
 
@@ -70,7 +70,8 @@ pipeline {
             steps {
                 dir('Backend/auth-service') {
                     container('gradle') {
-                        sh './gradlew clean build'  // 빌드 실행
+                        sh 'chmod +x ./gradlew'
+                        sh './gradlew clean bootJar'
                     }
                 }
             }
@@ -95,12 +96,13 @@ pipeline {
             }
         }
 
-        stage('Kubernetes Deploy') {
+        stage('Kubernetes Deployment') {
             steps {
                 container('kubectl') {
                     script {
                         def dockerImageTag = "${env.BUILD_NUMBER}"
-                        sh "kubectl set image deploy auth-deploy auth=${DOCKER_IMAGE_NAME}:${dockerImageTag} -n default --record"
+                        echo "DockerImageTag : ${dockerImageTag}"
+                        sh 'kubectl set image deploy auth-deploy auth=$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -n default'
                     }
                 }
             }
@@ -109,13 +111,28 @@ pipeline {
 
     post {
         success {
-            echo "Build and Deployment Successful"
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공",
+                webhookURL: "${DISCORD}"
+            }
         }
         failure {
-            echo "Build or Deployment Failed"
-        }
-        always {
-            cleanWs()  // 작업 공간 정리 (Workspace Cleanup 플러그인 필요)
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패",
+                webhookURL: "${DISCORD}"
+            }
         }
     }
 }
