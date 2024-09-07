@@ -1,5 +1,38 @@
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: jenkins-agent
+            spec:
+              containers:
+              - name: gradle
+                image: gradle:7.2-jdk17
+                command:
+                - cat
+                tty: true
+              - name: docker
+                image: docker:latest
+                command:
+                - cat
+                tty: true
+                volumeMounts:
+                - mountPath: "/var/run/docker.sock"
+                  name: docker-socket
+              - name: kubectl
+                image: bitnami/kubectl:latest
+                command:
+                - cat
+                tty: true
+              volumes:
+              - name: docker-socket
+                hostPath:
+                  path: "/var/run/docker.sock"
+            '''
+        }
+    }
 
     environment {
         DOCKER_CREDENTIALS_ID = 'dockerhub_access'  // dockerhub 자격증명 ID
@@ -16,18 +49,15 @@ pipeline {
             }
         }
 
-        stage('build'){
+        stage('Gradle Build') {
             steps {
-                script{
-                    echo "${pwd()}"
-                    echo "Add Permission"
-                        sh 'chmod +x ./Backend/student-service/gradlew'
-                        echo "Gradle Build"
-
-                        sh '''
-                        cd ./Backend/student-service
-                        ./gradlew bootjar
-                        '''
+                dir('Backend/student-service') {
+                    container('gradle') {
+                        script {
+                            sh 'chmod +x ./gradlew'  // gradlew 실행 권한 부여
+                            sh './gradlew clean build'  // 빌드 실행
+                        }
+                    }
                 }
             }
         }
@@ -35,21 +65,23 @@ pipeline {
         stage('Docker Image Build & Push') {
             steps {
                 dir('Backend/student-service') {
-                    script {
-                        def dockerImageTag = "${env.BUILD_NUMBER}"
+                    container('docker') {
+                        script {
+                            def dockerImageTag = "${env.BUILD_NUMBER}"
 
-                        echo "DockerImageTag : ${dockerImageTag}"
+                            echo "DockerImageTag : ${dockerImageTag}"
 
-                        sh 'docker logout'
-                        withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                            sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                            sh 'docker logout'
+                            withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                                sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                            }
+
+                            // Docker 이미지 빌드 및 푸시
+                            sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:${dockerImageTag} ."
+                            sh "docker push ${DOCKER_IMAGE_NAME}:${dockerImageTag}"
+
+                            sh 'docker logout'
                         }
-
-                        // Docker 이미지 빌드 및 푸시
-                        sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:${dockerImageTag} ."
-                        sh "docker push ${DOCKER_IMAGE_NAME}:${dockerImageTag}"
-
-                        sh 'docker logout'
                     }
                 }
             }
@@ -57,12 +89,14 @@ pipeline {
 
         stage('Kubernetes Deploy') {
             steps {
-                script {
-                    def dockerImageTag = "${env.BUILD_NUMBER}"
+                container('kubectl') {
+                    script {
+                        def dockerImageTag = "${env.BUILD_NUMBER}"
 
-                    echo "Deploying DockerImageTag : ${dockerImageTag}"
+                        echo "Deploying DockerImageTag : ${dockerImageTag}"
 
-                    sh "kubectl set image deploy student-deploy student=${DOCKER_IMAGE_NAME}:${dockerImageTag} -n default --record"
+                        sh "kubectl set image deploy student-deploy student=${DOCKER_IMAGE_NAME}:${dockerImageTag} -n default --record"
+                    }
                 }
             }
         }

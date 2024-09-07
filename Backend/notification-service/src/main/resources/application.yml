@@ -1,12 +1,16 @@
 spring:
   application:
-    name: ????
+    name: student-service
 
   datasource:
-    url: jdbc:mariadb://121.170.161.72:30028/testdb
-    username: beyond
-    password: beyond
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
+  #    url: jdbc:mariadb://mariadb-service:30028/testdb
+  #    username: beyond
+  #    password: beyond
+  #    driver-class-name: org.mariadb.jdbc.Driver
 
   jpa:
     hibernate:
