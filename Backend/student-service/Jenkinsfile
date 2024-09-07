@@ -49,9 +49,9 @@ pipeline {
             steps {
                 dir('Backend/student-service') {
                     container('gradle') {
-                        sh './gradlew clean build'
                         sh 'ls'
-                        sh 'gradle clean build'
+                        sh 'chmod +x ./gradlew'
+                        sh './gradlew clean build'
                     }
                 }
             }
