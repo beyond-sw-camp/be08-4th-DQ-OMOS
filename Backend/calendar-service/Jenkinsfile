@@ -5,20 +5,17 @@ pipeline {
             apiVersion: v1
             kind: Pod
             metadata:
-              name: calendar-service-agent
+              name: jenkins-agent
             spec:
               containers:
-              - name: calendar-service
-                image: eclipse-temurin:17.0.12_7-jdk
-                args:
-                - cat
+              - name: gradle
+                image: gradle:7.6.2-jdk17
+                command:
+                  - cat
                 tty: true
-                volumeMounts:
-                - mountPath: /root
-                  name: calendar-service-volume
               - name: docker
-                image: docker:27.2.0-alpine3.20
-                args:
+                image: docker:latest
+                command:
                 - cat
                 tty: true
                 volumeMounts:
@@ -26,17 +23,10 @@ pipeline {
                   name: docker-socket
               - name: kubectl
                 image: gcr.io/cloud-builders/kubectl
-                args:
-                - cat
-                tty: true
-              - name: gradle
-                image: gradle:7.6.2-jdk17
-                args:
+                command:
                 - cat
                 tty: true
               volumes:
-              - name: calendar-service-volume
-                emptyDir: {}
               - name: docker-socket
                 hostPath:
                   path: "/var/run/docker.sock"
@@ -45,65 +35,57 @@ pipeline {
     }
 
     environment {
+        DOCKER_CREDENTIALS_ID = 'dockerhub_access'
         DOCKER_IMAGE_NAME = 'jjjwww8802/calendar-service'
+        DOCKERHUB_URL = 'https://index.docker.io/v1/'
+        GITHUB_URL = 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
+        GITHUB_CREDENTIALS_ID = 'omos_access_ssh'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                dir('Backend/calendar-service') {
-                    git branch: 'main',
-                        url: 'https://github.com/beyond-sw-camp/be08-4th-DQ-OMOS.git'
-                }
+                git branch: 'main', credentialsId: "${GITHUB_CREDENTIALS_ID}", url: "${GITHUB_URL}"
             }
         }
 
         stage('Gradle Build') {
             steps {
-                container('gradle') {
-                    sh 'pwd'
-                    sh 'ls -al'
-                    sh 'gradle clean build -DskipTests'
-                    sh 'ls -al'
-                    sh 'ls -al ./build/libs'
+                dir('Backend/calendar-service') {
+                    container('gradle') {
+                        sh 'chmod +x ./gradlew'
+                        sh './gradlew clean bootJar'
+                    }
                 }
             }
         }
 
         stage('Docker Image Build & Push') {
             steps {
-                container('docker') {
-                    script {
-                        def dockerImageTag = "${env.BUILD_NUMBER}"
-
-                        echo "DockerImageTag : ${dockerImageTag}"
-
-                        sh 'docker logout'
-                        withCredentials([usernamePassword(credentialsId: 'dockerhub_access', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                            sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                dir('Backend/calendar-service') {
+                    container('docker') {
+                        script {
+                            def dockerImageTag = "${env.BUILD_NUMBER}"
+                            sh 'docker logout'
+                            withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                                sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                            }
+                            sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:${dockerImageTag} ."
+                            sh "docker push ${DOCKER_IMAGE_NAME}:${dockerImageTag}"
+                            sh 'docker logout'
                         }
-                        withEnv(["DOCKER_IMAGE_TAG=${dockerImageTag}"]) {
-                            sh 'docker build --no-cache -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG ./'
-                            sh 'docker image inspect $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
-                            sh 'docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
-                        }
-                        sh 'docker logout'
                     }
                 }
             }
         }
 
-        stage('Deployment') {
+        stage('Kubernetes Deployment') {
             steps {
                 container('kubectl') {
                     script {
                         def dockerImageTag = "${env.BUILD_NUMBER}"
-
                         echo "DockerImageTag : ${dockerImageTag}"
-
-                        withEnv(["DOCKER_IMAGE_TAG=${dockerImageTag}"]) {
-                            sh 'kubectl set image deploy calendar-deploy calendar=$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -n default'
-                        }
+                        sh 'kubectl set image deploy calendar-deploy calendar=$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -n default'
                     }
                 }
             }
@@ -119,7 +101,7 @@ pipeline {
                 실행 시간 : ${currentBuild.duration / 1000}s
                 """,
                 result: currentBuild.currentResult,
-                title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공", 
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공",
                 webhookURL: "${DISCORD}"
             }
         }
@@ -131,7 +113,7 @@ pipeline {
                 실행 시간 : ${currentBuild.duration / 1000}s
                 """,
                 result: currentBuild.currentResult,
-                title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패", 
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패",
                 webhookURL: "${DISCORD}"
             }
         }
