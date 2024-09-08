@@ -85,7 +85,7 @@ pipeline {
                     script {
                         def dockerImageTag = "${env.BUILD_NUMBER}"
                         echo "DockerImageTag : ${dockerImageTag}"
-                        sh "kubectl set image deploy student-deploy student=${DOCKER_IMAGE_NAME}:${dockerImageTag} -n default"
+                        sh "kubectl set image deploy calendar-deploy calendar=${DOCKER_IMAGE_NAME}:${dockerImageTag} -n default"
                     }
                 }
             }
@@ -100,7 +100,7 @@ pipeline {
                 결과 : ${currentBuild.result}
                 실행 시간 : ${currentBuild.duration / 1000}s
                 """,
-                result: currentBuild.currentResult,
+                result: currentBuild.currentResult
                 title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공",
                 webhookURL: "${DISCORD}"
             }
