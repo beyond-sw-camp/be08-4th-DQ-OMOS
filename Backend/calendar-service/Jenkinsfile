@@ -100,8 +100,8 @@ pipeline {
                 결과 : ${currentBuild.result}
                 실행 시간 : ${currentBuild.duration / 1000}s
                 """,
-                result: currentBuild.currentResult
-                title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공"
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공",
                 webhookURL: "${DISCORD}"
             }
         }
