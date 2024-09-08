@@ -85,7 +85,7 @@ pipeline {
                     script {
                         def dockerImageTag = "${env.BUILD_NUMBER}"
                         echo "DockerImageTag : ${dockerImageTag}"
-                        sh 'kubectl set image deploy auth-deploy auth=$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -n default'
+                        sh "kubectl set image deploy auth-deploy auth=${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -n default"
                     }
                 }
             }
