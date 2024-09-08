@@ -65,13 +65,12 @@ pipeline {
                 dir('Backend/student-service') {
                     container('docker') {
                         script {
-                            def dockerImageTag = "${env.BUILD_NUMBER}"
                             sh 'docker logout'
                             withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                                 sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                             }
-                            sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:${dockerImageTag} ."
-                            sh "docker push ${DOCKER_IMAGE_NAME}:${dockerImageTag}"
+                            sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:latest ."
+                            sh "docker push ${DOCKER_IMAGE_NAME}:latest"
                             sh 'docker logout'
                         }
                     }
@@ -83,9 +82,7 @@ pipeline {
             steps {
                 container('kubectl') {
                     script {
-                        def dockerImageTag = "${env.BUILD_NUMBER}"
-                        echo "DockerImageTag : ${dockerImageTag}"
-                        sh "kubectl set image deploy student-deploy student=${DOCKER_IMAGE_NAME}:${dockerImageTag} -n default"
+                        sh "kubectl set image deploy student-deploy student=${DOCKER_IMAGE_NAME}:latest -n default"
                     }
                 }
             }
