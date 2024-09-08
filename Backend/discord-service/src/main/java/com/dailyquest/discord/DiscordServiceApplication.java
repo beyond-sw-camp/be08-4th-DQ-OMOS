@@ -14,25 +14,16 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class DiscordServiceApplication {
 
-    @Value("${discord.bot.token}")
-    private String token;
-
     public static void main(String[] args) {
 
-        // 로컬 환경에서만 .env 파일 로드
-        if (isLocalEnvironment()) {
-            Dotenv dotenv = Dotenv.load();
-            System.setProperty("DB_URL", dotenv.get("DISCORD_TOKEN"));
-        }
+        // 로컬 환경에서만 .env 파일을 로드할 필요 없이, 환경 변수를 그대로 사용
+        System.setProperty("DB_URL", System.getenv("DB_URL"));
+        System.setProperty("DB_USERNAME", System.getenv("DB_USERNAME"));
+        System.setProperty("DB_PASSWORD", System.getenv("DB_PASSWORD"));
+        System.setProperty("DISCORD_TOKEN", System.getenv("DISCORD_TOKEN"));
 
         SpringApplication.run(DiscordServiceApplication.class, args);
     }
-
-    private static boolean isLocalEnvironment() {
-        // 로컬 환경을 판단하는 조건 (예: 특정 환경 변수가 설정되어 있지 않으면 로컬 환경으로 판단)
-        return System.getenv("CI") == null;  // GitHub Actions나 CI 시스템에서는 'CI' 환경 변수가 설정됨
-    }
-
 
     @Bean
     public CommandLineRunner run() {
