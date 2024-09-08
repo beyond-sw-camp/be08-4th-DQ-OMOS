@@ -39,7 +39,7 @@ pipeline {
         DOCKER_IMAGE_NAME = 'eunhee78/notification-service'
         DOCKERHUB_URL = 'https://index.docker.io/v1/'
         GITHUB_URL = 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
-        GITHUB_CREDENTIALS_ID = 'omos_notification_access_ssh'
+        GITHUB_CREDENTIALS_ID = 'omos_access_ssh'
     }
 
     stages {
@@ -51,7 +51,7 @@ pipeline {
 
         stage('Gradle Build') {
             steps {
-                dir('Backend/auth-service') {
+                dir('Backend/notification-service') {
                     container('gradle') {
                         sh 'chmod +x ./gradlew'
                         sh './gradlew clean bootJar'
@@ -62,7 +62,7 @@ pipeline {
 
         stage('Docker Image Build & Push') {
             steps {
-                dir('Backend/auth-service') {
+                dir('Backend/notification-service') {
                     container('docker') {
                         script {
                             def dockerImageTag = "${env.BUILD_NUMBER}"
@@ -85,7 +85,7 @@ pipeline {
                     script {
                         def dockerImageTag = "${env.BUILD_NUMBER}"
                         echo "DockerImageTag : ${dockerImageTag}"
-                        sh 'kubectl set image deploy auth-deploy auth=$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -n default'
+                        sh 'kubectl set image deploy notification-deploy notification=$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -n default'
                     }
                 }
             }
