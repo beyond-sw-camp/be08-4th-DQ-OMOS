@@ -152,7 +152,7 @@ onBeforeMount(() => {
                     {{ formatDate(new Date(data.closeDt)) }}
                 </template>
             </Column>
-            <!-- 
+            <!-- 왜 안바뀜?
             <Column field="status" header="상 태" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                 <template #body="{ data }">
                     <Tag :value="data.status" :severity="getSeverity(data.status)" />
