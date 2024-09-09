@@ -122,7 +122,7 @@
 ## 📋 ERD
 [ERD](https://www.erdcloud.com/d/T7nuCDkZTJACtXbog)
 
-![HangUpT (3)](https://github.com/user-attachments/assets/34203277-f7c5-401f-b1f0-1c460d3bcbce)
+![HangUpT (3)]([https://github.com/user-attachments/assets/34203277-f7c5-401f-b1f0-1c460d3bcbce](https://github.com/beyond-sw-camp/be08-4th-DQ-OMOS/blob/main/Images/erd.png?raw=true))
 
 <br>
 
