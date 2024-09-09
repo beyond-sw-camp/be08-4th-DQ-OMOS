@@ -21,16 +21,16 @@ const notifications = [
   // 추가 알림 항목들...
 ];
 
-// 모달 열기
+// 모달 열기 함수
 function openModal(notification) {
     selectedNotification.value = notification;
-    alarmDisplayDialog.value = true;
+    displayDialog.value = true;
 }
 
-// 모달 닫기
+// 모달 닫기 함수
 function closeModal() {
-    alarmDisplayDialog.value = false;
-    selectedNotification.value = null;
+    displayDialog.value = false;
+    selectedAnnouncement.value = null;
 }
 
 // 승인 버튼 클릭 처리
@@ -60,18 +60,9 @@ const chartData = ref(null);
 const chartOptions = ref(null);
 const currentDate = ref(new Date().toLocaleString());
 
-function open() {
-    display.value = true;
-}
-
-function close() {
-    display.value = false;
-}
-
 const updateDate = () => {
     currentDate.value = new Date().toLocaleString();
 };
-
 
 // 공지사항 데이터 정의
 const announcements = ref([
@@ -89,12 +80,84 @@ const announcements = ref([
         content: '내일 오전 2시부터 4시까지 서버 점검이 있을 예정입니다. 서비스 이용에 참고 바랍니다.',
         date: '2023-09-02'
     },
+    {
+        id: 3,
+        type: '일반',
+        title: '서비스 업데이트 안내',
+        content: '오는 9월 10일, 새로운 기능과 성능 개선이 포함된 서비스 업데이트가 예정되어 있습니다.',
+        date: '2023-09-05'
+        },
+    {
+        id: 4,
+        type: '긴급',
+        title: '보안 패치 적용 공지',
+        content: '최근 발생한 보안 취약점으로 인해 긴급 보안 패치가 적용될 예정입니다. 적용 시간 동안 서비스 이용에 일시적인 불편이 있을 수 있습니다.',
+        date: '2023-09-07'
+    },
+    {
+        id: 5,
+        type: '일반',
+        title: '휴무일 안내',
+        content: '추석 연휴로 인해 9월 28일부터 10월 2일까지 고객 지원 서비스가 운영되지 않습니다. 서비스 이용에 참고 바랍니다.',
+        date: '2023-09-15'
+    },
+    {
+        id: 6,
+        type: '이벤트',
+        title: '가을 이벤트 시작!',
+        content: '9월 20일부터 10월 10일까지 특별한 가을 이벤트가 진행됩니다. 다양한 혜택을 놓치지 마세요!',
+        date: '2023-09-18'
+    },
+    {
+        id: 7,
+        type: '공지',
+        title: '고객센터 운영시간 변경 안내',
+        content: '고객센터 운영 시간이 9월 30일부터 오전 9시~오후 6시로 변경됩니다. 서비스 이용에 불편 없으시길 바랍니다.',
+        date: '2023-09-20'
+    },
+    {
+        id: 8,
+        type: '긴급',
+        title: '서비스 장애 복구 안내',
+        content: '금일 발생한 일시적인 서비스 장애가 복구되었습니다. 불편을 끼쳐드린 점 양해 부탁드립니다.',
+        date: '2023-09-25'
+    },
+    {
+        id: 9,
+        type: '공지',
+        title: '개인정보 처리방침 변경 안내',
+        content: '개인정보 처리방침이 2023년 10월 1일부터 개정됩니다. 자세한 내용은 홈페이지를 참고해 주세요.',
+        date: '2023-09-27'
+    },
+    {
+        id: 10,
+        type: '이벤트',
+        title: '회원 대상 감사 이벤트!',
+        content: '저희 서비스를 이용해 주시는 모든 회원분들을 위한 특별 감사 이벤트가 10월 1일부터 시작됩니다!',
+        date: '2023-09-30'
+    },
+    {
+        id: 11,
+        type: '공지',
+        title: '시스템 업그레이드 완료 안내',
+        content: '금일 시스템 업그레이드가 성공적으로 완료되었습니다. 이제 더욱 향상된 서비스 속도를 경험하실 수 있습니다.',
+        date: '2023-10-02'
+    },
+    {
+        id: 12,
+        type: '긴급',
+        title: '정기 점검 일정 변경 안내',
+        content: '예정되었던 정기 서버 점검 일정이 10월 5일로 변경되었습니다. 변경된 일정에 맞춰 서비스 이용에 불편이 없도록 협조 부탁드립니다.',
+        date: '2023-10-03'
+    }
+
     // 추가 공지사항 항목들...
 ]);
 
 // Dialog와 선택된 공지사항을 위한 상태 관리
 const displayDialog = ref(false);
 const selectedAnnouncement = ref(null);
+// const selectedNotification = ref(null);
 
 // Dialog 열기 함수
 function openDialog(announcement) {
@@ -297,7 +360,7 @@ watch([getPrimary, getSurface, isDarkTheme], () => {
                 </DataTable>
 
                 <!-- Dialog -->
-                <Dialog header="공지사항 상세" v-model:visible="displayDialog" pt:mask:class="backdrop-blur-md" :breakpoints="{ '960px': '75vw' }" :style="{ width: '30vw' }" :modal="true">
+                <Dialog header="공지사항" v-model:visible="displayDialog" pt:mask:class="backdrop-blur-md" :breakpoints="{ '960px': '75vw' }" :style="{ width: '30vw' }" :modal="true">
                     <template v-if="selectedAnnouncement">
                         <p class="text-lg font-bold">{{ selectedAnnouncement.title }}</p>
                         <p class="text-sm text-gray-500">{{ selectedAnnouncement.date }}</p>
