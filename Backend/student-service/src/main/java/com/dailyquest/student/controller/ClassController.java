@@ -15,11 +15,11 @@ import java.util.List;
 @RequestMapping("/api/class")
 public class ClassController {
 
-    private final ClassService classService;
-
-    @GetMapping("/classNames")
-    public ResponseEntity<List<String>> getClassNames() {
-        List<String> classNames = classService.getClassNames();
-        return ResponseEntity.ok(classNames);
-    }
+//    private final ClassService classService;
+//
+//    @GetMapping("/classNames")
+//    public ResponseEntity<List<String>> getClassNames() {
+//        List<String> classNames = classService.getClassNames();
+//        return ResponseEntity.ok(classNames);
+//    }
 }

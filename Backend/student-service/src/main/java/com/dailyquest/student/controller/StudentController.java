@@ -1,6 +1,7 @@
 package com.dailyquest.student.controller;
 
 import com.dailyquest.student.dto.StudentDto;
+import com.dailyquest.student.service.ClassService;
 import com.dailyquest.student.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.List;
 public class StudentController {
 
     private final StudentService studentService;
+    private final ClassService classService;
 
     @GetMapping("/studentList")
     public ResponseEntity<List<StudentDto>> studentList(){
@@ -24,6 +26,12 @@ public class StudentController {
         List<StudentDto> studentDtoList = studentService.studentList();
         System.out.println("studentDtoList = " + studentDtoList);
         return ResponseEntity.ok(studentDtoList);
+    }
+
+    @GetMapping("/classNames")
+    public ResponseEntity<List<String>> getClassNames() {
+        List<String> classNames = classService.getClassNames();
+        return ResponseEntity.ok(classNames);
     }
 
 }
