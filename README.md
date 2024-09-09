@@ -106,12 +106,6 @@
 
 <br>
 
-## 📃 테이블 명세서
-[테이블 명세서](https://docs.google.com/spreadsheets/d/13E_mtIu6xKc1JoF_HQh8CLfdxFWL-oyIPik1oPiHtm0/edit?gid=1722768850#gid=1722768850)
-<br>
-
-<br>
-
 
 ## 📄 API 명세서
 [API 명세서](https://docs.google.com/spreadsheets/d/1kN0B6VXFFMemADbPnXZI4MWu9M5F2A280pIkb7VU2IQ/edit?gid=0#gid=0)
@@ -121,7 +115,7 @@
 <br>
 
 ## 📺 화면 설계서
-[Figma 보러가기](https://docs.google.com/spreadsheets/d/1XLJgmxzfDuktnxHkMER6E0PUneXnT5mGuhI6E46-cP8/edit?gid=0#gid=0)
+[Figma 보러가기](https://www.figma.com/board/CP2qZczh6IBRz0CkyhWt3l/Untitled?node-id=0-1&t=ALIywOoeckRvyGUO-1)
 
 <br>
 <br>
@@ -132,6 +126,7 @@
 
 ![시스템 아키텍처](https://github.com/beyond-sw-camp/be08-4th-DQ-OMOS/blob/main/Images/%EC%8B%9C%EC%8A%A4%ED%85%9C%20%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png?raw=true)
 
+![CI/CD](https://github.com/beyond-sw-camp/be08-4th-DQ-OMOS/blob/main/Images/cicd.png?raw=true)
 
 <br>
 
@@ -166,10 +161,10 @@
 ## 🐻 한줄 회고록
 |&nbsp;&nbsp;&nbsp;&nbsp;팀&nbsp;원&nbsp;&nbsp;&nbsp;&nbsp;|회고|
 |:----:|----|
-|👑김종원|<br>짧은 기간 안에 완성을 하느라 힘든점도 많았지만, 더 빨리 성장할 수 있었던것 같습니다. 이번 프로젝트에서는 Vue로 프론트 개발 뿐만아니라 저번에 배운 스프링 프레임워크를 사용해 백엔드까지 구현을 하면서 전체적인 웹 개발 흐름을 이해할 수 있었습니다.<br>&nbsp;|
-|🍙김태영|<br>처음 해보는 프론트 프로젝트라서 낯설었지만, 백엔드까지 함께 사용하여서, 프로젝트의 전반적인 구조를 알 수 있었던 경험이었습니다<br>&nbsp;|
-|🐶이은서|<br>쿠키왕과 함꼐한 프론트 프로젝트. 프론트와 백엔드의 통신을 이해할 수 있는 뜻깊은 프로젝트였습니다. 다들 고생하셨어요<br>&nbsp;|
-|🧁조은희|<br>짧은 기간이었지만 알찬 경험이었습니다! 고생한 팀원들에게 감사합니다 :><br>&nbsp;|
-|🐧홍석민|<br>다들 너무 고생하셨습니다. 인상깊은건 수줍음 많은 팀장님이 쿠키를 주실때였습니다. 감사했습니다<br>&nbsp;|
+|👑김종원|<br><br>&nbsp;|
+|🍙김태영|<br><br>&nbsp;|
+|🐶이은서|<br><br>&nbsp;|
+|🧁조은희|<br><br>&nbsp;|
+|🐧홍석민|<br>|
 
 <br>
