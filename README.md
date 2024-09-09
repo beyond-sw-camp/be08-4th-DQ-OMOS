@@ -14,8 +14,6 @@
       <td align="center"><a href="https://github.com/tkckdnjs"><img src="https://avatars.githubusercontent.com/u/170069568?v=4" width="140px;" height="140px"  alt=""/><br /><b>🐶이은서</b></a><br /></td>
       <td align="center"><a href="https://github.com/eunhee78"><img src="https://avatars.githubusercontent.com/u/82626246?v=4" width="140px;" height="140px" alt=""/><br /><b>🍉조은희</b></a><br /></td>
       <td align="center"><a href="https://github.com/mmvne"><img src="https://avatars.githubusercontent.com/u/45449480?v=4" width="140px;" height="140px" alt=""/><br /><b>🧁홍석민</b></a><br /></td>
-      <td align="center"><a href="https://github.com/byHyen">
-     <tr/>
   </tbody>
 </table>
 </div>
@@ -25,32 +23,47 @@
 <div align=center>
 
 ## 🛠️ Tech Stack 🛠️
-  <img src="https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html&logoColor=white"> 
-  <img src="https://img.shields.io/badge/css-1572B6?style=for-the-badge&logo=css3&logoColor=white">
-  <img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">
-  <br>
-  <img src="https://img.shields.io/badge/vue.js-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white">
-  <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"/>
-  <img alt="Java" src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white"/>
-  <img src="https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white"/>
-  <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
-  <br>
-  <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white">
-  <img src="https://img.shields.io/badge/Redis-%23D92B21.svg?style=for-the-badge&logo=redis&logoColor=white"/>
-  <img src="https://img.shields.io/badge/bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white">
-  
+  <h4>CI/CD</h4>
+<div class="stack-container">
+    <img src="https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=Jenkins&logoColor=white">
+    <img src="https://img.shields.io/badge/docker-002260?style=for-the-badge&logo=docker&logoColor=white">
+    <img src="https://img.shields.io/badge/kubernetes-%231572B6?style=for-the-badge&logo=kubernetes&logoColor=white">
+    <img src="https://img.shields.io/badge/ngrok-%233A0CA3?style=for-the-badge&logo=ngrok&logoColor=white">
 
 
-<br>
-<br>
+<h4> Backend</h4>
+<div class="stack-container">
+    <img src="https://img.shields.io/badge/java-F7DF1E?style=for-the-badge&logo=java&logoColor=white">
+    <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
+    <img src="https://img.shields.io/badge/Amazon%20RDS-527FFF?style=for-the-badge&logo=Amazon%20RDS&logoColor=white">
+	
+</div>
 
- 
- ## ⚙️ Tool ⚙️
-  <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
-  <img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white">
-  <img src= "https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white">
-  <img alt="IntelliJ" src="https://img.shields.io/badge/IntelliJ IDEA-%23FF9900?style=for-the-badge&logo=intellij idea&logoColor=white" />
-  <img src="https://img.shields.io/badge/figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white"/>
+<h4>Frontend</h4>
+<div class="stack-container">
+    <img src="https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white">
+    <img src="https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white">
+    <img src="https://img.shields.io/badge/vuejs-%2335495e.svg?style=for-the-badge&logo=vuedotjs&logoColor=%234FC08D">
+    <img src="https://img.shields.io/badge/bootstrap-%23563D7C?style=for-the-badge&logo=bootstrap&logoColor=white">
+    <img src="https://img.shields.io/badge/PrimeVue-%23639a67?style=for-the-badge&logo=vue.js&logoColor=white">
+
+
+</div>
+
+<h4>VCS</h4>
+<img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white"/>
+
+<h4>협업 툴</h4>
+<img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white"/>
+<img src="https://img.shields.io/badge/googledocs-4285F4?style=for-the-badge&logo=googledocs&logoColor=white"/>
+<img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"/>
+<img src="https://img.shields.io/badge/IntelliJ%20IDEA-000000.svg?style=for-the-badge&logo=intellij-idea&logoColor=white">
+<img src="https://img.shields.io/badge/Visual%20Studio%20Code-007ACC?style=for-the-badge&logo=visual-studio-code&logoColor=white">
+
+
+
+
+</div>
 
 </div>
 <br>
@@ -72,8 +85,6 @@
 ## 🔆 프로젝트 목적 및 기대효과
 
 출석률에 도움을 주겠죠?
-
-✔ 사용자들에게 주변과 타 지역의 행사 정보를 쉽고 빠르게 제공합니다.
 <br> 
 
 
