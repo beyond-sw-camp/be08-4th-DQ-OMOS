@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: student
-        image: jjjwww8802/student-service:1.0
+        image: jjjwww8802/student-service:latest
         ports:
         - containerPort: 8080
         env:
