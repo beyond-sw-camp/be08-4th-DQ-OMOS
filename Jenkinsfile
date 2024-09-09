@@ -37,11 +37,11 @@ pipeline {
             steps {
                 container('kubectl') {
                     script {
-                        sh "kubectl set image deploy auth-deploy auth=jjjwww8802/auth-service:latest -n default"
-                        sh "kubectl set image deploy student-deploy student=jjjwww8802/student-service:latest -n default"
-                        sh "kubectl set image deploy calendar-deploy calendar=jjjwww8802/calendar-service:latest -n default"
-                        sh "kubectl set image deploy notice-deploy notice=jjjwww8802/notice-service:latest -n default"
-                        sh "kubectl set image deploy notification-deploy notification=jjjwww8802/notification-service:latest -n default"
+                        sh "kubectl rollout restart deploy auth-deploy -n default"
+                        sh "kubectl rollout restart deploy student-deploy -n default"
+                        sh "kubectl rollout restart deploy calendar-deploy -n default"
+                        sh "kubectl rollout restart deploy notice-deploy -n default"
+                        sh "kubectl rollout restart deploy notification-deploy -n default"
                     }
                 }
             }
