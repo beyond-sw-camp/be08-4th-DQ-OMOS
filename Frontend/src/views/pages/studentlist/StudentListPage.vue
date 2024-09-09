@@ -152,11 +152,13 @@ onBeforeMount(() => {
                     {{ formatDate(new Date(data.closeDt)) }}
                 </template>
             </Column>
+            <!-- 
             <Column field="status" header="상 태" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                 <template #body="{ data }">
                     <Tag :value="data.status" :severity="getSeverity(data.status)" />
                 </template>
             </Column>
+            -->
         </DataTable>
 
         <StudentDetailModal :student="selectedStudent" :visible="displayDialog" @update:visible="displayDialog = $event" />
