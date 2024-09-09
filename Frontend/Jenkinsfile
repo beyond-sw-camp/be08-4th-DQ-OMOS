@@ -83,6 +83,7 @@ pipeline {
                 container('kubectl') {
                     script {
                         sh "kubectl set image deploy frontend-deploy frontend=${DOCKER_IMAGE_NAME}:latest -n default"
+                        sh "kubectl rollout restart deploy frontend-deploy -n default"
                     }
                 }
             }
