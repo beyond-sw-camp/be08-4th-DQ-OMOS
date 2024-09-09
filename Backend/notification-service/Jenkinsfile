@@ -83,6 +83,7 @@ pipeline {
                 container('kubectl') {
                     script {
                         sh "kubectl set image deploy notification-deploy notification=${DOCKER_IMAGE_NAME}:latest -n default"
+                        sh "kubectl rollout restart deploy notification-deploy -n default"
                     }
                 }
             }

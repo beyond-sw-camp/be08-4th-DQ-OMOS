@@ -83,6 +83,7 @@ pipeline {
                 container('kubectl') {
                     script {
                         sh "kubectl set image deploy calendar-deploy calendar=${DOCKER_IMAGE_NAME}:latest -n default"
+                        sh "kubectl rollout restart deploy calendar-deploy -n default"
                     }
                 }
             }

@@ -83,6 +83,7 @@ pipeline {
                 container('kubectl') {
                     script {
                         sh "kubectl set image deploy auth-deploy auth=${DOCKER_IMAGE_NAME}:latest -n default"
+                        sh "kubectl rollout restart deploy auth-deploy -n default"
                     }
                 }
             }
