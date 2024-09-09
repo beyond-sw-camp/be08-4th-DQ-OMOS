@@ -1,6 +1,6 @@
 package com.dailyquest.notice.controller;
 
-import com.dailyquest.notice.dto.NoticeDto;
+import com.dailyquest.notice.entity.Notice;
 import com.dailyquest.notice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +18,8 @@ public class NoticeController {
 
     // 공지사항 목록 불러오기
     @GetMapping("/noticeList")
-    public ResponseEntity<List<NoticeDto>> noticeList() {
-        List<NoticeDto> noticeDtoList = noticeService.noticeList();
+    public ResponseEntity<List<Notice>> noticeList() {
+        List<Notice> noticeDtoList = noticeService.noticeList();
         System.out.println("noticeDtoList = " + noticeDtoList);
         return ResponseEntity.ok(noticeDtoList);
     }
