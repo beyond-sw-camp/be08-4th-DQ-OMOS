@@ -1,8 +1,5 @@
 # be08-4th-DailyQuest-OneMinOneSec
 
-![포스터](https://github.com/user-attachments/assets/80bec21f-b002-4e7c-9c20-2245c84f46b4)
-
-
 <div align="center">
   <br><b>:dizzy:한화시스템 BEYOND SW캠프 4차 프로젝트:dizzy:</b></br></div>
 
