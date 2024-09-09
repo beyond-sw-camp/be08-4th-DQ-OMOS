@@ -14,6 +14,8 @@ spring:
   #    username: beyond
   #    password: beyond
   #    driver-class-name: org.mariadb.jdbc.Driver
+    hikari:
+      maximum-pool-size: 5  # 이 값이 연결 풀 크기
 
   jpa:
     hibernate:
