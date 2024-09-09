@@ -62,25 +62,15 @@
 
 ## 🍀 프로젝트 소개
 
- 행업튀 : 행사 업고 튀어 (지역 행사 커뮤니티)
+ OMOS : One Minute One Second
 
-🍀 사용자에게 주변과 타 지역의 행사 정보를 쉽고 빠르게 제공하는 서비스
+🍀 관리자에게 학생 정보를 보내줄 수 있습니다.
 <br>
 
-🍀 사용자가 원하는 행사만을 쏙쏙 골라낼 수 있도록 도와줍니다!
+🍀 캘린더를 통해 일정을 확인하고 조율할 수 있습니다.
 <br> 
 
-🍀 지도를 이용해 우리나라 행사들의 위치정보를 알고 싶다면~? 행업튀로 고고!
-<br> 
 
-🍀 지역별! 온라인과 오프라인! 유료와 무료! 등 다양한 조건을 필터링한 결과가 알고 싶다면? 행업튀로 고고!
-<br> 
-
-🍀 지역별 게시판을 통한 자유로운 소통의 장을 경험하고 싶다면? 행업튀로 고고!
-<br> 
-
-🍀 다양한 필터 기능을 통해 관심있는 행사만 빠르게 알아봅시다!
-<br> 
 
 ⭐간편하고 재미있는 행사 탐색, 이제 행업튀와 함께하세요!
 
@@ -130,14 +120,14 @@
 <br>
 
 ## 📋 ERD
-[ERD](https://www.erdcloud.com/d/vrJuznrhmcSEgDax2)
+[ERD](https://www.erdcloud.com/d/T7nuCDkZTJACtXbog)
 
 ![HangUpT (3)](https://github.com/user-attachments/assets/34203277-f7c5-401f-b1f0-1c460d3bcbce)
 
 <br>
 
 ## 📄 API 명세서
-[API 명세서](https://docs.google.com/spreadsheets/d/13E_mtIu6xKc1JoF_HQh8CLfdxFWL-oyIPik1oPiHtm0/edit?gid=1880524329#gid=1880524329)
+[API 명세서](https://docs.google.com/spreadsheets/d/1kN0B6VXFFMemADbPnXZI4MWu9M5F2A280pIkb7VU2IQ/edit?gid=0#gid=0)
 ![image](https://github.com/user-attachments/assets/6fc0d30f-4a6c-448c-a18f-106c1a77adaf)
 ![image](https://github.com/user-attachments/assets/d12a9c6e-a974-4d27-b15f-90ee510c56e8)
 ![image](https://github.com/user-attachments/assets/7aafaa78-60b1-4827-b455-f15202b1356e)
