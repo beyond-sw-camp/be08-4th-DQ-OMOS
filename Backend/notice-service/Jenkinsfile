@@ -5,7 +5,7 @@ pipeline {
             apiVersion: v1
             kind: Pod
             metadata:
-              name: jenkins-agent
+              name: jenkins-agent-${env.BUILD_NUMBER}
             spec:
               containers:
               - name: gradle
