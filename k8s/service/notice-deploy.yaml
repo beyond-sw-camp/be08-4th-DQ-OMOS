@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: notice
-        image: jjjwww8802/notice-service:1.0
+        image: notice-service:1.1
         ports:
         - containerPort: 8080
         resources:

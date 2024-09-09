@@ -14,13 +14,13 @@ spec:
     spec:
       containers:
       - name: student
-        image: jjjwww8802/student-service:1.0
+        image: student-service:1.1
         ports:
         - containerPort: 8080
         resources:
           requests:
-            memory: "1024Mi"
-            cpu: "1000m"
+            memory: "512Mi"
+            cpu: "500m"
           limits:
-            memory: "2Gi"
-            cpu: "2"
+            memory: "1Gi"
+            cpu: "1"
