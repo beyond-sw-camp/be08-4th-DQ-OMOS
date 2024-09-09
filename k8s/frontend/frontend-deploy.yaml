@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: frontend-deploy
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: frontend-label
@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: jjjwww8802/frontend:1.0
+        image: jjjwww8802/frontend:latest
         ports:
         - containerPort: 80
