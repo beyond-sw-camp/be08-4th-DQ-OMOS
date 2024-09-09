@@ -8,10 +8,16 @@
         :style="{ width: '500px', maxWidth: '90vw' }"
     >
         <div v-if="student" class="student-details">
-            <p><strong>이름:</strong> {{ student.name }}</p>
-            <p><strong>개강일:</strong> {{ formatDate(student.date) }}</p>
+            <p><strong>이름:</strong> {{ student.studentName }}</p>
+            <p><strong>개강일:</strong> {{ formatDate(new Date(student.openDt)) }}</p>
+            <p><strong>강사명:</strong> {{ student.teacher }}</p>
+            <!--
             <p><strong>상태:</strong> {{ student.status }}</p>
             <p><strong>출석률:</strong> {{ student.activity }}%</p>
+            -->
+        </div>
+        <div v-else>
+            <p>학생 정보가 없습니다.</p>
         </div>
     </Dialog>
 </template>
@@ -27,6 +33,7 @@ const props = defineProps({
 const emit = defineEmits(['update:visible']);
 
 const localVisible = ref(props.visible);
+const student = ref(props.student);
 
 // 부모에서 받은 visible 상태를 로컬 상태로 반영
 watch(
@@ -42,13 +49,21 @@ function handleVisibilityUpdate(newVal) {
     emit('update:visible', newVal);
 }
 
-function formatDate(value) {
-    return value.toLocaleDateString('en-US', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
+watch(
+    () => props.student,
+    (newVal) => {
+        console.log('학생 데이터:', newVal);
+        student.value = newVal;
+    }
+);
+
+function formatDate(date) {
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+        return ''; // 유효하지 않은 날짜일 경우 빈 문자열 반환
+    }
+    return date.toLocaleDateString(); // 또는 다른 형식의 날짜 문자열로 변경 가능
 }
+
 </script>
 
 <style scoped>
