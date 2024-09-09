@@ -135,9 +135,650 @@
 <br>
 <br>
 
-## 📜 테스트 케이스 정의서
-[테스트 케이스](https://docs.google.com/spreadsheets/d/12N-G9al1tnTjl8u3ZokSTqF3judVcs0DO58jzSeaduU/edit?gid=0#gid=0)
+## 📜 배포 파일
+<details>
+<summary>auth-service-jenkinsfile</summary>
 
+``` YML
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: jenkins-agent-${env.BUILD_NUMBER}
+            spec:
+              containers:
+              - name: gradle
+                image: gradle:7.6.2-jdk17
+                command:
+                  - cat
+                tty: true
+              - name: docker
+                image: docker:latest
+                command:
+                - cat
+                tty: true
+                volumeMounts:
+                - mountPath: "/var/run/docker.sock"
+                  name: docker-socket
+              - name: kubectl
+                image: gcr.io/cloud-builders/kubectl
+                command:
+                - cat
+                tty: true
+              volumes:
+              - name: docker-socket
+                hostPath:
+                  path: "/var/run/docker.sock"
+            '''
+        }
+    }
+
+    environment {
+        DOCKER_CREDENTIALS_ID = 'dockerhub_access'
+        DOCKER_IMAGE_NAME = 'jjjwww8802/auth-service'
+        DOCKERHUB_URL = 'https://index.docker.io/v1/'
+        GITHUB_URL = 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
+        GITHUB_CREDENTIALS_ID = 'omos_access_ssh'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', credentialsId: "${GITHUB_CREDENTIALS_ID}", url: "${GITHUB_URL}"
+            }
+        }
+
+        stage('Gradle Build') {
+            steps {
+                dir('Backend/auth-service') {
+                    container('gradle') {
+                        sh 'chmod +x ./gradlew'
+                        sh './gradlew clean bootJar'
+                    }
+                }
+            }
+        }
+
+        stage('Docker Image Build & Push') {
+            steps {
+                dir('Backend/auth-service') {
+                    container('docker') {
+                        script {
+                            sh 'docker logout'
+                            withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                                sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                            }
+                            sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:latest ."
+                            sh "docker push ${DOCKER_IMAGE_NAME}:latest"
+                            sh 'docker logout'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Kubernetes Deployment') {
+            steps {
+                container('kubectl') {
+                    script {
+                        sh "kubectl set image deploy auth-deploy auth=${DOCKER_IMAGE_NAME}:latest -n default"
+                        sh "kubectl rollout restart deploy auth-deploy -n default"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공",
+                webhookURL: "${DISCORD}"
+            }
+        }
+        failure {
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패",
+                webhookURL: "${DISCORD}"
+            }
+        }
+    }
+}
+
+```
+</details>
+
+<br>
+
+<details>
+<summary>calendar-service-jenkinsfile</summary>
+
+``` YML
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: jenkins-agent-${env.BUILD_NUMBER}
+            spec:
+              containers:
+              - name: gradle
+                image: gradle:7.6.2-jdk17
+                command:
+                  - cat
+                tty: true
+              - name: docker
+                image: docker:latest
+                command:
+                - cat
+                tty: true
+                volumeMounts:
+                - mountPath: "/var/run/docker.sock"
+                  name: docker-socket
+              - name: kubectl
+                image: gcr.io/cloud-builders/kubectl
+                command:
+                - cat
+                tty: true
+              volumes:
+              - name: docker-socket
+                hostPath:
+                  path: "/var/run/docker.sock"
+            '''
+        }
+    }
+
+    environment {
+        DOCKER_CREDENTIALS_ID = 'dockerhub_access'
+        DOCKER_IMAGE_NAME = 'jjjwww8802/calendar-service'
+        DOCKERHUB_URL = 'https://index.docker.io/v1/'
+        GITHUB_URL = 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
+        GITHUB_CREDENTIALS_ID = 'omos_access_ssh'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', credentialsId: "${GITHUB_CREDENTIALS_ID}", url: "${GITHUB_URL}"
+            }
+        }
+
+        stage('Gradle Build') {
+            steps {
+                dir('Backend/calendar-service') {
+                    container('gradle') {
+                        sh 'chmod +x ./gradlew'
+                        sh './gradlew clean bootJar'
+                    }
+                }
+            }
+        }
+
+        stage('Docker Image Build & Push') {
+            steps {
+                dir('Backend/calendar-service') {
+                    container('docker') {
+                        script {
+                            sh 'docker logout'
+                            withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                                sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                            }
+                            sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:latest ."
+                            sh "docker push ${DOCKER_IMAGE_NAME}:latest"
+                            sh 'docker logout'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Kubernetes Deployment') {
+            steps {
+                container('kubectl') {
+                    script {
+                        sh "kubectl set image deploy calendar-deploy calendar=${DOCKER_IMAGE_NAME}:latest -n default"
+                        sh "kubectl rollout restart deploy calendar-deploy -n default"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공",
+                webhookURL: "${DISCORD}"
+            }
+        }
+        failure {
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패",
+                webhookURL: "${DISCORD}"
+            }
+        }
+    }
+}
+
+```
+</details>
+
+<br>
+
+<details>
+<summary>notice-service-jenkinsfile</summary>
+
+``` YML
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: jenkins-agent-${env.BUILD_NUMBER}
+            spec:
+              containers:
+              - name: gradle
+                image: gradle:7.6.2-jdk17
+                command:
+                  - cat
+                tty: true
+              - name: docker
+                image: docker:latest
+                command:
+                - cat
+                tty: true
+                volumeMounts:
+                - mountPath: "/var/run/docker.sock"
+                  name: docker-socket
+              - name: kubectl
+                image: gcr.io/cloud-builders/kubectl
+                command:
+                - cat
+                tty: true
+              volumes:
+              - name: docker-socket
+                hostPath:
+                  path: "/var/run/docker.sock"
+            '''
+        }
+    }
+
+    environment {
+        DOCKER_CREDENTIALS_ID = 'dockerhub_access'
+        DOCKER_IMAGE_NAME = 'jjjwww8802/notice-service'
+        DOCKERHUB_URL = 'https://index.docker.io/v1/'
+        GITHUB_URL = 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
+        GITHUB_CREDENTIALS_ID = 'omos_access_ssh'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', credentialsId: "${GITHUB_CREDENTIALS_ID}", url: "${GITHUB_URL}"
+            }
+        }
+
+        stage('Gradle Build') {
+            steps {
+                dir('Backend/notice-service') {
+                    container('gradle') {
+                        sh 'chmod +x ./gradlew'
+                        sh './gradlew clean bootJar'
+                    }
+                }
+            }
+        }
+
+        stage('Docker Image Build & Push') {
+            steps {
+                dir('Backend/notice-service') {
+                    container('docker') {
+                        script {
+                            sh 'docker logout'
+                            withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                                sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                            }
+                            sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:latest ."
+                            sh "docker push ${DOCKER_IMAGE_NAME}:latest"
+                            sh 'docker logout'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Kubernetes Deployment') {
+            steps {
+                container('kubectl') {
+                    script {
+                        sh "kubectl set image deploy notice-deploy notice=${DOCKER_IMAGE_NAME}:latest -n default"
+                        sh "kubectl rollout restart deploy notice-deploy -n default"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공",
+                webhookURL: "${DISCORD}"
+            }
+        }
+        failure {
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패",
+                webhookURL: "${DISCORD}"
+            }
+        }
+    }
+}
+
+```
+</details>
+
+<br>
+
+<details>
+<summary>notification-service-jenkinsfile</summary>
+
+``` YML
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: jenkins-agent-${env.BUILD_NUMBER}
+            spec:
+              containers:
+              - name: gradle
+                image: gradle:7.6.2-jdk17
+                command:
+                  - cat
+                tty: true
+              - name: docker
+                image: docker:latest
+                command:
+                - cat
+                tty: true
+                volumeMounts:
+                - mountPath: "/var/run/docker.sock"
+                  name: docker-socket
+              - name: kubectl
+                image: gcr.io/cloud-builders/kubectl
+                command:
+                - cat
+                tty: true
+              volumes:
+              - name: docker-socket
+                hostPath:
+                  path: "/var/run/docker.sock"
+            '''
+        }
+    }
+
+    environment {
+        DOCKER_CREDENTIALS_ID = 'dockerhub_access'
+        DOCKER_IMAGE_NAME = 'jjjwww8802/notification-service'
+        DOCKERHUB_URL = 'https://index.docker.io/v1/'
+        GITHUB_URL = 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
+        GITHUB_CREDENTIALS_ID = 'omos_access_ssh'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', credentialsId: "${GITHUB_CREDENTIALS_ID}", url: "${GITHUB_URL}"
+            }
+        }
+
+        stage('Gradle Build') {
+            steps {
+                dir('Backend/notification-service') {
+                    container('gradle') {
+                        sh 'chmod +x ./gradlew'
+                        sh './gradlew clean bootJar'
+                    }
+                }
+            }
+        }
+
+        stage('Docker Image Build & Push') {
+            steps {
+                dir('Backend/notification-service') {
+                    container('docker') {
+                        script {
+                            sh 'docker logout'
+                            withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                                sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                            }
+                            sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:latest ."
+                            sh "docker push ${DOCKER_IMAGE_NAME}:latest"
+                            sh 'docker logout'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Kubernetes Deployment') {
+            steps {
+                container('kubectl') {
+                    script {
+                        sh "kubectl set image deploy notification-deploy notification=${DOCKER_IMAGE_NAME}:latest -n default"
+                        sh "kubectl rollout restart deploy notification-deploy -n default"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공",
+                webhookURL: "${DISCORD}"
+            }
+        }
+        failure {
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패",
+                webhookURL: "${DISCORD}"
+            }
+        }
+    }
+}
+
+
+```
+</details>
+
+<br>
+
+<details>
+<summary>student-service-jenkinsfile</summary>
+
+``` YML
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: jenkins-agent-${env.BUILD_NUMBER}
+            spec:
+              containers:
+              - name: gradle
+                image: gradle:7.6.2-jdk17
+                command:
+                  - cat
+                tty: true
+              - name: docker
+                image: docker:latest
+                command:
+                - cat
+                tty: true
+                volumeMounts:
+                - mountPath: "/var/run/docker.sock"
+                  name: docker-socket
+              - name: kubectl
+                image: gcr.io/cloud-builders/kubectl
+                command:
+                - cat
+                tty: true
+              volumes:
+              - name: docker-socket
+                hostPath:
+                  path: "/var/run/docker.sock"
+            '''
+        }
+    }
+
+    environment {
+        DOCKER_CREDENTIALS_ID = 'dockerhub_access'
+        DOCKER_IMAGE_NAME = 'jjjwww8802/student-service'
+        DOCKERHUB_URL = 'https://index.docker.io/v1/'
+        GITHUB_URL = 'git@github.com:beyond-sw-camp/be08-4th-DQ-OMOS.git'
+        GITHUB_CREDENTIALS_ID = 'omos_access_ssh'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', credentialsId: "${GITHUB_CREDENTIALS_ID}", url: "${GITHUB_URL}"
+            }
+        }
+
+        stage('Gradle Build') {
+            steps {
+                dir('Backend/student-service') {
+                    container('gradle') {
+                        sh 'chmod +x ./gradlew'
+                        sh './gradlew clean bootJar'
+                    }
+                }
+            }
+        }
+
+        stage('Docker Image Build & Push') {
+            steps {
+                dir('Backend/student-service') {
+                    container('docker') {
+                        script {
+                            sh 'docker logout'
+                            withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                                sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                            }
+                            sh "docker build --no-cache -t ${DOCKER_IMAGE_NAME}:latest ."
+                            sh "docker push ${DOCKER_IMAGE_NAME}:latest"
+                            sh 'docker logout'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Kubernetes Deployment') {
+            steps {
+                container('kubectl') {
+                    script {
+                        sh "kubectl set image deploy student-deploy student=${DOCKER_IMAGE_NAME}:latest -n default"
+                        sh "kubectl rollout restart deploy student-deploy -n default"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공",
+                webhookURL: "${DISCORD}"
+            }
+        }
+        failure {
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: """
+                제목 : ${currentBuild.displayName}
+                결과 : ${currentBuild.result}
+                실행 시간 : ${currentBuild.duration / 1000}s
+                """,
+                result: currentBuild.currentResult,
+                title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패",
+                webhookURL: "${DISCORD}"
+            }
+        }
+    }
+}
+
+```
+</details>
 
 <br>
 <br>
@@ -148,14 +789,6 @@
 
 
 <br>
-
-## 테스트
-
-
-<br>
-
-
-
 
 
 ## 🐻 한줄 회고록
