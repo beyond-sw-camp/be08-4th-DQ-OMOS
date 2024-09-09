@@ -788,6 +788,10 @@ pipeline {
 <br>
 <br>
 
+## ▶️ CICD 테스트(Jenkinsfile)
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/kdVEqg6ewk0/0.jpg)](https://www.youtube.com/watch?v=kdVEqg6ewk0)
+<br>
+
 ## 📅 WBS
 [WBS](https://docs.google.com/spreadsheets/d/1BI3uCB31D9dol-k-YqnDGOJ90PBCP7Zki6-JhUEhBj8/edit?gid=0#gid=0)
 
