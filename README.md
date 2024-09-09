@@ -99,7 +99,6 @@
 <br>
 
 
-
 ## 📄 API 명세서
 [API 명세서](https://docs.google.com/spreadsheets/d/1kN0B6VXFFMemADbPnXZI4MWu9M5F2A280pIkb7VU2IQ/edit?gid=0#gid=0)
 
