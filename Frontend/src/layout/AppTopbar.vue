@@ -54,7 +54,7 @@ const handleLogout = async () => {
           </g>
         </svg>
 
-        <span>DailyQQ</span>
+        <span>DailyQuest</span>
       </router-link>
     </div>
 
