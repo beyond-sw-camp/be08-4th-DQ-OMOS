@@ -39,7 +39,7 @@ async function fetchStudentList() {
 
 async function fetchClassNames() {
     try {
-        const response = await axios.get('http://localhost:31003/api/classNames', {
+        const response = await axios.get('http://localhost:31003/api/class/classNames', {
             headers: {
                 'Content-Type': 'application/json'
             }
