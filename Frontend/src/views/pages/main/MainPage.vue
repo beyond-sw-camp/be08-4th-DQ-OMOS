@@ -21,16 +21,18 @@ const notifications = [
   // 추가 알림 항목들...
 ];
 
-// 모달 열기 함수
+// 모달 열기 함수 (알림 관련)
 function openModal(notification) {
     selectedNotification.value = notification;
-    displayDialog.value = true;
+    alarmDisplayDialog.value = true;  // alarmDisplayDialog를 사용
+    document.body.classList.add('blurred-background');
+
 }
 
-// 모달 닫기 함수
+// 모달 닫기 함수 (알림 관련)
 function closeModal() {
-    displayDialog.value = false;
-    selectedAnnouncement.value = null;
+    alarmDisplayDialog.value = false;  // alarmDisplayDialog를 사용
+    selectedNotification.value = null;
 }
 
 // 승인 버튼 클릭 처리
@@ -157,7 +159,6 @@ const announcements = ref([
 // Dialog와 선택된 공지사항을 위한 상태 관리
 const displayDialog = ref(false);
 const selectedAnnouncement = ref(null);
-// const selectedNotification = ref(null);
 
 // Dialog 열기 함수
 function openDialog(announcement) {
@@ -373,43 +374,45 @@ watch([getPrimary, getSurface, isDarkTheme], () => {
             </div>
         </div>
         <div class="col-span-12 xl:col-span-6">
-            <div class="card">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="font-semibold text-xl">알림</div>
-                    <div>
-                        <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="$refs.menu1.toggle($event)"></Button>
-                        <Menu ref="menu1" :popup="true" :model="items" class="!min-w-40"></Menu>
+            <div :class="alarmDisplayDialog ? 'blurred-background' : ''">
+                <div class="card">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="font-semibold text-xl">알림</div>
+                        <div>
+                            <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="$refs.menu1.toggle($event)"></Button>
+                            <Menu ref="menu1" :popup="true" :model="items" class="!min-w-40"></Menu>
+                        </div>
                     </div>
-                </div>
-                <ul class="p-0 mx-0 mt-0 mb-6 list-none">
-                    <li v-for="item in notifications" :key="item.id" class="flex items-center py-2 border-b border-surface cursor-pointer" @click="openModal(item)">
-                        <div :class="['w-12 h-12 flex items-center justify-center rounded-full mr-4 shrink-0', item.bgColor]">
-                        <OverlayBadge severity="danger">
-                            <i :class="item.iconClass" :style="{ fontSize: '1.5rem' }"></i>
-                        </OverlayBadge>
-                        </div>
-                        <span class="text-surface-900 dark:text-surface-0 leading-normal">
-                        {{ item.text }}<br>
-                        </span>
-                    </li>
-                    <!-- 더보기 버튼 -->
-                    <li v-if="!showMore" class="flex items-center py-2 cursor-pointer" @click="toggleShowMore">
-                        <div class="w-full h-12 flex items-center justify-center">
-                        <span class="text-blue-500 text-center">
-                            더보기
-                        </span>
-                        </div>
-                    </li>
-                </ul>
+                    <ul class="p-0 mx-0 mt-0 mb-6 list-none">
+                        <li v-for="item in notifications" :key="item.id" class="flex items-center py-2 border-b border-surface cursor-pointer" @click="openModal(item)">
+                            <div :class="['w-12 h-12 flex items-center justify-center rounded-full mr-4 shrink-0', item.bgColor]">
+                                <OverlayBadge severity="danger">
+                                    <i :class="item.iconClass" :style="{ fontSize: '1.5rem' }"></i>
+                                </OverlayBadge>
+                            </div>
+                            <span class="text-surface-900 dark:text-surface-0 leading-normal">
+                                {{ item.text }}<br>
+                            </span>
+                        </li>
+                        <!-- 더보기 버튼 -->
+                        <li v-if="!showMore" class="flex items-center py-2 cursor-pointer" @click="toggleShowMore">
+                            <div class="w-full h-12 flex items-center justify-center">
+                                <span class="text-blue-500 text-center">
+                                    더보기
+                                </span>
+                            </div>
+                        </li>
+                    </ul>
 
-                <!-- 모달 다이얼로그 -->
-                <Dialog header="승인/거부" v-model:visible="alarmDisplayDialog" :style="{ width: '30vw' }" modal>
-                    <p>선택된 항목: {{ selectedNotification?.text }}</p>
-                    <div class="flex justify-end gap-2 mt-4">
-                        <Button label="승인" icon="pi pi-check" @click="approve" class="p-button-success" />
-                        <Button label="거부" icon="pi pi-times" @click="reject" class="p-button-danger" />
-                    </div>
-                </Dialog>
+                    <!-- 알림 승인/거부 모달 -->
+                    <Dialog header="승인/거부" pt:mask:class="backdrop-blur-md" v-model:visible="alarmDisplayDialog" :style="{ width: '30vw' }" modal @hide="removeBlurEffect">
+                        <p>{{ selectedNotification?.text }}</p>
+                        <div class="flex justify-end gap-2 mt-4">
+                            <Button label="승인" icon="pi pi-check" @click="approve" class="p-button-success" />
+                            <Button label="거부" icon="pi pi-times" @click="reject" class="p-button-danger" />
+                        </div>
+                    </Dialog>
+                </div>
             </div>
         </div>
     </div> 
