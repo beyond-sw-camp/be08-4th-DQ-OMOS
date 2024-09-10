@@ -45,7 +45,8 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
         // 이후에 JWT 를 읽어서 데이터를 가져올 수도 있지만, JWT 파싱 비용이 많이 들기 때문에
         // 처음 JWT 발급할 때 이름을 함께 넘긴 후, 로컬 스토리지에 저장한다.
         String encodedEmail = URLEncoder.encode(email, "UTF-8");
-        response.sendRedirect("http://localhost:31000/oauth2-jwt-header?email=" + encodedEmail);
+        response.sendRedirect("http://120.50.90.75:31000/oauth2-jwt-header?email=" + encodedEmail);
+
     }
 
 }
