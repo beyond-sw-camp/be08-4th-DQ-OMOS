@@ -128,6 +128,10 @@
 [Figma 보러가기](https://www.figma.com/board/CP2qZczh6IBRz0CkyhWt3l/Untitled?node-id=0-1&t=ALIywOoeckRvyGUO-1)
 
 <br>
+
+![포스터]([https://github.com/beyond-sw-camp/be08-4th-DQ-OMOS/blob/main/Images/%EB%A9%94%EC%9D%B8%EC%9D%B4%EB%AF%B8%EC%A7%80.png?raw=true](https://github.com/beyond-sw-camp/be08-4th-DQ-OMOS/blob/main/Images/figma.png?raw=true))
+
+<br>
 <br>
 
 ## 📑 시스템 아키텍처
