@@ -224,6 +224,7 @@ export default defineComponent({
 .demo-app-sidebar {
     width: 300px;
     line-height: 1.5;
+    color: #333;
     background: #eaf9ff;
     border-right: 1px solid #d3e2e8;
     padding: 2em;
@@ -237,5 +238,13 @@ export default defineComponent({
 .fc {
     max-width: 1100px;
     margin: 0 auto;
+}
+
+@media (prefers-color-scheme: dark) {
+    .demo-app-sidebar {
+        color: #e0e0e0; /* 다크모드일 때 글씨 색상을 밝게 설정합니다. */
+        background: #2c2c2c; /* 배경도 다크모드에 맞게 어두운 색상으로 변경합니다. */
+        border-right: 1px solid #444;
+    }
 }
 </style>

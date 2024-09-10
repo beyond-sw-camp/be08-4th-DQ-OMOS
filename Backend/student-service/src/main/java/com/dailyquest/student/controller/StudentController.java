@@ -28,10 +28,10 @@ public class StudentController {
         return ResponseEntity.ok(studentDtoList);
     }
 
-    @GetMapping("/classNames")
-    public ResponseEntity<List<String>> getClassNames() {
-        List<String> classNames = classService.getClassNames();
-        return ResponseEntity.ok(classNames);
-    }
+    // @GetMapping("/classNames")
+    // public ResponseEntity<List<String>> getClassNames() {
+    //     List<String> classNames = classService.getClassNames();
+    //     return ResponseEntity.ok(classNames);
+    // }
 
 }
