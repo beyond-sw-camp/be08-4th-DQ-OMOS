@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
         info = @Info(
                 title = "Auth Service",
                 description = "Auth Service API",
-                version = "v12.0.0"
+                version = "v20.0.0"
         )
 )
 public class SwaggerConfig {
