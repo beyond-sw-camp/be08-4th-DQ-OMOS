@@ -129,7 +129,7 @@
 
 <br>
 
-![포스터]([https://github.com/beyond-sw-camp/be08-4th-DQ-OMOS/blob/main/Images/%EB%A9%94%EC%9D%B8%EC%9D%B4%EB%AF%B8%EC%A7%80.png?raw=true](https://github.com/beyond-sw-camp/be08-4th-DQ-OMOS/blob/main/Images/figma.png?raw=true))
+![포스터](https://github.com/beyond-sw-camp/be08-4th-DQ-OMOS/blob/main/Images/figma.png?raw=true)
 
 <br>
 <br>
