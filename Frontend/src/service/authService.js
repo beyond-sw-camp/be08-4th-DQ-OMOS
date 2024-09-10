@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:31001';
+const API_URL = 'http://120.50.90.75:31001';
 
 const register = async (email, name, password) => {
   const formData = new FormData();
