@@ -22,7 +22,7 @@ const selectedClass = ref(null); // 선택된 클래스 상태 관리
 // API 호출하여 학생 데이터 가져오기
 async function fetchStudentList() {
     try {
-        const response = await axios.get('http://localhost:31003/api/student/studentList', {
+        const response = await axios.get('http://120.50.90.75:31003/api/student/studentList', {
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -39,7 +39,7 @@ async function fetchStudentList() {
 
 async function fetchClassNames() {
     try {
-        const response = await axios.get('http://localhost:31003/api/class/classNames', {
+        const response = await axios.get('http://120.50.90.75:31003/api/class/classNames', {
             headers: {
                 'Content-Type': 'application/json'
             }
